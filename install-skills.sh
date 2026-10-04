@@ -63,38 +63,57 @@ prune() {
   done
 }
 
-# Skills that only make sense on my home-manager machines.
-personal_only=(add-nix-package)
+# Skills and personas that only make sense on my personal machines.
+personal_only=(add-nix-package youtuber fiction-cowriter fiction-reviewer obsidian-writer)
+is_personal() { [[ " ${personal_only[*]} " == *" $(basename "$1" .md) "* ]]; }
 
+# work-only/ holds skills home-manager does not deploy (lean-code replaces
+# ponytail where third-party skills are not allowed).
 skill_sources=()
 for file in "$skills"/*.md; do
-  [[ " ${personal_only[*]} " == *" $(basename "$file" .md) "* ]] || skill_sources+=("$file")
+  is_personal "$file" || skill_sources+=("$file")
 done
-for dir in "$skills"/*/; do
+for dir in "$skills"/*/ "$src"/work-only/*/; do
   if [ -f "$dir/SKILL.md" ]; then skill_sources+=("${dir%/}"); fi
 done
 
-for dir in "${skill_dirs[@]}"; do
+persona_sources=()
+for persona in "$personas"/*.md; do
+  is_personal "$persona" || persona_sources+=("$persona")
+done
+
+# Earlier versions linked OpenCode's whole skills folder; it now gets
+# per-skill links like every other tool.
+old="$HOME/.config/opencode/skills/software-engineering"
+if ours "$old"; then rm "$old"; fi
+
+# Remove links an earlier run made for anything now in personal_only.
+for dir in "${skill_dirs[@]}" "$HOME/.config/opencode/skills" "$HOME/.claude/agents" "$HOME/.config/opencode/agents"; do
+  for name in "${personal_only[@]}"; do
+    for path in "$dir/$name" "$dir/$name/SKILL.md" "$dir/$name.md"; do
+      if ours "$path"; then rm "$path"; fi
+    done
+    rmdir "$dir/$name" 2>/dev/null || true
+  done
+done
+
+for dir in "${skill_dirs[@]}" "$HOME/.config/opencode/skills"; do
   prune "$dir"
   for skill in "${skill_sources[@]}"; do
     install_skill "$dir" "$skill"
   done
 done
 
-for persona in "$personas"/*.md; do
+for persona in "${persona_sources[@]}"; do
   install_skill "$HOME/.agents/skills" "$persona"
 done
 
 # Claude Code and OpenCode read personas as sub-agents.
 for dir in "$HOME/.claude/agents" "$HOME/.config/opencode/agents"; do
   prune "$dir"
-  for persona in "$personas"/*.md; do
+  for persona in "${persona_sources[@]}"; do
     link "$persona" "$dir/$(basename "$persona")"
   done
 done
 
-# OpenCode finds skills recursively under its skills directory.
-prune "$HOME/.config/opencode/skills"
-link "$skills" "$HOME/.config/opencode/skills/software-engineering"
-
-echo "Linked ${#skill_sources[@]} skills and $(ls "$personas"/*.md | wc -l) personas from $src"
+echo "Linked ${#skill_sources[@]} skills and ${#persona_sources[@]} personas from $src"
