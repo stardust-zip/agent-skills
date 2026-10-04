@@ -1,6 +1,6 @@
 ---
 name: learn-fast
-description: Evidence-based tutor for picking up a new field fast - placement check, concept map, try-before-told cycles, quizzes with confidence ratings, and spaced review cards. Modes are full session, meeting-in-an-hour, and review. Use when the user wants to learn or understand a topic, prepare for a meeting on one, or review what they studied.
+description: Evidence-based tutor for picking up a new field fast - placement check, concept map, try-before-told cycles, quizzes with confidence ratings, spaced review cards and note rewrites, with notes kept in the user's vault via note-coach. Use to learn a topic, prepare for a meeting on one, or review what was studied.
 ---
 
 # Learn Fast
@@ -15,25 +15,31 @@ This skill follows what learning research supports, and avoids what it does not:
 
 ## Where records live
 
-Each machine keeps its own records; nothing is ever copied from the work machine to a personal one, or the other way.
+Records live in the user's note vault, the same one `note-coach` uses. Each machine keeps its own vault; nothing is ever copied from the work machine to a personal one, or the other way.
 
-- **Work machine** (`~/work-docs/` exists): `~/work-docs/learning/`. No sync. Examples may use the user's real services (via `service-map`).
-- **Personal machines**: `~/backpack/learning/`, a private git repository shared by the personal laptop and phone.
-  - Before a session: `git -C ~/backpack/learning pull --rebase --autostash`.
-  - After it: commit (`learn: <topic> <mode> <date>`) and push.
-  - If the folder does not exist, tell the user once how to set it up (create a private repository on their own git host, clone it to `~/backpack/learning` on both devices); until then, work locally.
-  - If a pull or push fails, say so and keep the session's changes local. Never force-push.
-  - **No company details.** Use public knowledge only. If the user mentions an internal system, keep it generic ("your company's file-storage wrapper") and never write internal names, data or designs into these records.
+- **Work machine** (`~/work-docs/` exists): `~/work-docs/notebook/`. No sync. Examples may use the user's real services (via `service-map`).
+- **Personal machines:** `$NOTEBOOK_DIR` if set, otherwise `~/projects/gitea/gitkeeper/notebook`, a private git repository shared by the personal laptop and phone. If neither exists, ask the user where their notebook clone is (and suggest setting `NOTEBOOK_DIR`); never create a new vault silently.
+  - Before a session: `git -C <vault> pull --rebase --autostash`.
+  - After it: stage only the files the session touched, commit with the repo's convention (`note-creation: <topic>` for a new note, `note-update: <topic>` otherwise), and push.
+  - If a pull or push fails, say so and keep the changes local. Never force-push.
+  - **No company details.** Use public knowledge only. If the user mentions an internal system, keep it generic ("your company's file-storage wrapper") and never write internal names, data or designs into the vault.
 
-Per topic, a folder `<root>/<topic-slug>/` with `topic.md` (from `{skill-root}/assets/topic.md`) and `cards.tsv`, managed only through `{skill-root}/scripts/cards.sh`:
+Per topic, two files with the same domain-prefixed base name (`compsci-vector-databases`):
+- `<vault>/notes/<name>.md`: the **learning note**. Its *Progress* section holds levels, map, calibration and the session log. Create it from `{skill-root}/../note-coach/assets/learning-note.md` if it does not exist; reuse an existing note on the topic. learn-fast writes only *Progress* and the frontmatter fields `level`, `status` (for `green`) and `updated`; the other sections are the user's, written through `note-coach`.
+- `<vault>/cards/<name>.tsv`: review cards, managed only through `{skill-root}/scripts/cards.sh`:
 
 ```bash
-bash {skill-root}/scripts/cards.sh add <topic-dir> <level> "<question>" "<answer>" "<source>"
-bash {skill-root}/scripts/cards.sh due <topic-dir>...       # questions only, never answers
-bash {skill-root}/scripts/cards.sh show <topic-dir> <id>    # reveal one answer
-bash {skill-root}/scripts/cards.sh grade <topic-dir> <id> again|hard|good
-bash {skill-root}/scripts/cards.sh stats <topic-dir>...
+bash {skill-root}/scripts/cards.sh add <vault>/cards/<name>.tsv <level> "<question>" "<answer>" "<source>"
+bash {skill-root}/scripts/cards.sh due <vault>/cards/*.tsv      # questions only, never answers
+bash {skill-root}/scripts/cards.sh show <cards.tsv> <id>        # reveal one answer
+bash {skill-root}/scripts/cards.sh grade <cards.tsv> <id> again|hard|good
+bash {skill-root}/scripts/cards.sh stats <vault>/cards/*.tsv
+bash {skill-root}/scripts/cards.sh notes-due <vault>/notes      # learning notes due for a rewrite
 ```
+
+Old notes in the archived `bronze-notebook` (`~/projects/gitea/gitkeeper/bronze-notebook`, personal machines only) may be used as source material for a session, never as evidence that the user knows a topic, and are never edited.
+
+When a level check passes at level 3 or higher, set the note's `status` to `green`. Set `level` to the highest level recorded as `placed` or `known`.
 
 ## Levels and placement
 
@@ -47,7 +53,7 @@ bash {skill-root}/scripts/cards.sh stats <topic-dir>...
 The first time a topic is studied on this machine, run a **placement check**, even if the user studied it elsewhere. Their knowledge travels with them; the records do not.
 - Start at level 2. Ask two or three questions at that level, one at a time, each answered with a confidence rating (1 guess, 2 fairly sure, 3 certain).
 - Correct on most, with confidence at least 2: mark the level `placed` and move up. Otherwise move down, or start learning there.
-- Stop at the first level not passed, or at the target. Record the result and evidence in `topic.md`.
+- Stop at the first level not passed, or at the target. Record the result and evidence in the note's *Progress* section.
 
 ## Rules for every interaction
 
@@ -72,20 +78,23 @@ Pick the mode from the request; ask only if unclear.
    Finish each cycle with one retrieval question.
 5. **Transfer:** one task from the user's real work: explain it to their boss in three sentences, critique a design, write the questions they would ask a vendor or an expert.
 6. **Cards:** add five to ten, mostly from what the user got wrong or found hard, tagged with their level.
-7. **Close:** level changes, calibration, what to review tomorrow. Update `topic.md`, then sync if on a personal machine.
+7. **Note:** hand over to `note-coach` so the user writes or extends the learning note from memory. If they are out of time, add a card with the question "NOTE: write the note on <topic> from memory" (answer "use note-coach") so it comes back in review.
+8. **Close:** level changes, calibration, what to review tomorrow. Update the note's *Progress* section, then sync if on a personal machine.
 
 **Meeting in an hour (about 15 minutes).**
 1. The meeting's subject and the user's role in it.
 2. A compact map, and a cheat sheet: the terms they will hear, each in one line.
 3. Five questions that show understanding, and three claims to be sceptical of, with why.
 4. A three-question quiz.
-5. Three to five cards, so the knowledge lasts past the meeting.
+5. Three to five cards, so the knowledge lasts past the meeting. Offer a two-minute `note-coach` note afterwards; skip it if they are short of time.
 
 **Review (5–10 minutes).**
-1. List due cards across topics with `cards.sh due` (or one topic, if the user names it).
-2. For each, one at a time: show the question, wait for the answer and confidence, then `show` the answer, give one line of feedback, and `grade`.
-3. At most about twenty cards; stop early if the user wants.
-4. Close with `cards.sh stats` and the calibration line. If most misses sit at one level, mark that level `learning` again and suggest a full session.
+1. List due cards with `cards.sh due` (or one topic, if the user names it), and due learning notes with `cards.sh notes-due`.
+2. Mix them: about one item in five is a note rewrite, when any note is due. Never two rewrites in a row.
+3. For a card, one at a time: show the question, wait for the answer and confidence, then `show` the answer, give one line of feedback, and `grade`. A `NOTE:` card hands over to `note-coach` to write that note; grade it `good` once written, `hard` if postponed again.
+4. For a note rewrite, hand over to `note-coach`'s rewrite-from-memory mode, then continue.
+5. At most about twenty items; stop early if the user wants.
+6. Close with `cards.sh stats` and the calibration line. If most misses sit at one level, mark that level `learning` again in the note and suggest a full session.
 
 ## After any session
 

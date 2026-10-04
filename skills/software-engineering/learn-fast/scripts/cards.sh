@@ -1,32 +1,48 @@
 #!/usr/bin/env bash
-# Spaced-review cards for the learn-fast skill. Each topic folder holds one
-# cards.tsv with the columns: id level box due question answer source.
-# A card moves up a box when answered well and back to box 1 when missed;
-# the box sets the days until it is due again (expanding intervals, the
-# spacing effect). Dates are ISO (YYYY-MM-DD), so string order is date order.
+# Spaced review for the learn-fast and note-coach skills.
+#
+# Cards: one TSV per topic (cards/<topic>.tsv) with the columns
+# id level box due question answer source. A card moves up a box when
+# answered well and back to box 1 when missed; the box sets the days until
+# it is due again (expanding intervals, the spacing effect).
+#
+# Notes: learning notes (frontmatter `type: learning`) come due for a
+# rewrite from memory based on their status and `last_reviewed` date.
+#
+# Dates are ISO (YYYY-MM-DD), so string order is date order.
 set -euo pipefail
 
-intervals=(0 1 3 7 16 35 75) # days, indexed by box 1..6
+intervals=(0 1 3 7 16 35 75) # card days, indexed by box 1..6
 max_box=6
+declare -A note_interval=([seed]=3 [growing]=14 [green]=45) # note days, by status
 today=$(date +%F)
 header=$'id\tlevel\tbox\tdue\tquestion\tanswer\tsource'
 
 usage() {
   cat >&2 <<'EOF'
-usage: cards.sh add <topic-dir> <level 1-4> <question> <answer> [source]
-       cards.sh due <topic-dir>...          cards due today or earlier (no answers)
-       cards.sh show <topic-dir> <id>        the answer and source of one card
-       cards.sh grade <topic-dir> <id> again|hard|good
-       cards.sh stats <topic-dir>...         total, due and per-box counts
+usage: cards.sh add <cards.tsv> <level 1-4> <question> <answer> [source]
+       cards.sh due <cards.tsv>...           cards due today or earlier (no answers)
+       cards.sh show <cards.tsv> <id>         the answer and source of one card
+       cards.sh grade <cards.tsv> <id> again|hard|good
+       cards.sh stats <cards.tsv>...          total, due and per-box counts
+       cards.sh notes-due <notes-dir>         learning notes due for a rewrite from memory
 EOF
   exit 2
 }
 
 field_ok() { [[ "$1" != *$'\t'* && "$1" != *$'\n'* ]]; }
 
-card_file() {
-  [ -f "$1/cards.tsv" ] || { echo "no cards in $1" >&2; exit 1; }
-  printf '%s/cards.tsv' "$1"
+need_file() { [ -f "$1" ] || { echo "no cards file $1" >&2; exit 1; }; }
+
+topic_of() { basename "$1" .tsv; }
+
+# frontmatter <file> <key>: the value of a top-level key in the YAML frontmatter.
+frontmatter() {
+  awk -v key="$2" '
+    NR == 1 && $0 != "---" { exit }
+    NR > 1 && $0 == "---" { exit }
+    NR > 1 && index($0, key ":") == 1 { sub("^" key ":[ \t]*", ""); gsub(/["'\'']/, ""); print; exit }
+  ' "$1"
 }
 
 cmd="${1:-}"
@@ -36,13 +52,12 @@ shift
 case "$cmd" in
   add)
     [ $# -ge 4 ] || usage
-    dir="$1" level="$2" question="$3" answer="$4" source="${5:-}"
+    file="$1" level="$2" question="$3" answer="$4" source="${5:-}"
     [[ "$level" =~ ^[1-4]$ ]] || { echo "level must be 1-4" >&2; exit 2; }
     for value in "$question" "$answer" "$source"; do
       field_ok "$value" || { echo "fields may not contain tabs or newlines" >&2; exit 2; }
     done
-    mkdir -p "$dir"
-    file="$dir/cards.tsv"
+    mkdir -p "$(dirname "$file")"
     [ -f "$file" ] || printf '%s\n' "$header" >"$file"
     id=$(awk -F'\t' 'NR > 1 && $1 + 0 > max { max = $1 + 0 } END { print max + 1 }' "$file")
     due=$(date -d "$today + ${intervals[1]} day" +%F)
@@ -52,24 +67,24 @@ case "$cmd" in
 
   due)
     [ $# -ge 1 ] || usage
-    for dir in "$@"; do
-      [ -f "$dir/cards.tsv" ] || continue
-      awk -F'\t' -v today="$today" -v topic="$(basename "$dir")" \
-        'NR > 1 && $4 <= today { print topic "\t" $1 "\tlevel " $2 "\t" $5 }' "$dir/cards.tsv"
+    for file in "$@"; do
+      [ -f "$file" ] || continue
+      awk -F'\t' -v today="$today" -v topic="$(topic_of "$file")" \
+        'NR > 1 && $4 <= today { print topic "\t" $1 "\tlevel " $2 "\t" $5 }' "$file"
     done
     ;;
 
   show)
     [ $# -eq 2 ] || usage
-    file=$(card_file "$1")
+    need_file "$1"
     awk -F'\t' -v id="$2" 'NR > 1 && $1 == id { print "answer: " $6; if ($7 != "") print "source: " $7; found = 1 }
-      END { if (!found) { print "no card " id > "/dev/stderr"; exit 1 } }' "$file"
+      END { if (!found) { print "no card " id > "/dev/stderr"; exit 1 } }' "$1"
     ;;
 
   grade)
     [ $# -eq 3 ] || usage
-    file=$(card_file "$1")
-    id="$2" result="$3"
+    file="$1" id="$2" result="$3"
+    need_file "$file"
     box=$(awk -F'\t' -v id="$id" 'NR > 1 && $1 == id { print $3 }' "$file")
     [ -n "$box" ] || { echo "no card $id" >&2; exit 1; }
     case "$result" in
@@ -88,15 +103,31 @@ case "$cmd" in
 
   stats)
     [ $# -ge 1 ] || usage
-    for dir in "$@"; do
-      [ -f "$dir/cards.tsv" ] || continue
-      awk -F'\t' -v today="$today" -v topic="$(basename "$dir")" '
+    for file in "$@"; do
+      [ -f "$file" ] || continue
+      awk -F'\t' -v today="$today" -v topic="$(topic_of "$file")" '
         NR > 1 { total++; boxes[$3]++; if ($4 <= today) due++ }
         END {
           line = sprintf("%s: %d cards, %d due", topic, total, due)
           for (b = 1; b <= 6; b++) line = line sprintf(", box%d=%d", b, boxes[b] + 0)
           print line
-        }' "$dir/cards.tsv"
+        }' "$file"
+    done
+    ;;
+
+  notes-due)
+    [ $# -eq 1 ] || usage
+    for note in "$1"/*.md; do
+      [ -f "$note" ] || continue
+      [ "$(frontmatter "$note" type)" = learning ] || continue
+      status=$(frontmatter "$note" status)
+      last=$(frontmatter "$note" last_reviewed)
+      [ -n "$last" ] || last=$(frontmatter "$note" created)
+      days="${note_interval[$status]:-3}"
+      due=$(date -d "${last:-$today} + $days day" +%F 2>/dev/null) || due="$today"
+      if [[ "$due" < "$today" || "$due" == "$today" ]]; then
+        printf '%s\t%s\tlast reviewed %s\n' "$(basename "$note" .md)" "${status:-seed}" "${last:-never}"
+      fi
     done
     ;;
 
