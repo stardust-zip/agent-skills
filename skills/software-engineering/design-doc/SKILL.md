@@ -1,6 +1,6 @@
 ---
 name: design-doc
-description: Writes a design doc (RFC) for a feature or system change, grounded in the existing code, tracks it through gates from problem agreement to approval, and prepares the user to defend it in review. Use when the user asks for a design doc, RFC, technical proposal or "how would we build X", brings a task-decoder hand-off item routed to design-doc, or returns with review comments or an approval for an existing design doc. It writes the document only; it does not implement the design.
+description: Writes a design doc (RFC) grounded in the code, tracks it through gates from problem agreement to approval, and preps the user for review. Use for design docs, RFCs, technical proposals or "how would we build X", and for review comments or approvals on one.
 ---
 
 # Design Doc
@@ -25,6 +25,7 @@ Check whether `~/work-docs/` exists. If it does, this is a work machine, and com
 One of:
 - A task-decoder hand-off item (skill, what it uses from earlier items, task statement), often from a plan in `notes/items/`.
 - The user's own description of what needs designing.
+- A `feature-brainstorm` record (`docs/design/*-brainstorm.md`, or its `~/work-docs/` equivalent). Its decisions are settled: build on them, do not ask them again in the interview, and list them in "Decisions I made for you" only if you had to go beyond them.
 - A PRD, a ticket, or notes from a discussion.
 - An existing design doc plus review comments, an owner's confirmation, or an approval. Then skip to the gate the doc is at.
 
@@ -82,6 +83,7 @@ If you are running inside a repository, read before you ask or write.
 
 - **House style.** Look for existing design docs, RFCs or ADRs (commonly `docs/design/`, `docs/rfcs/`, `docs/architecture/`, `docs/adr/`, `rfcs/`) and for a template file, both in the repository and, on a work machine, in `~/work-docs/<repo-name>/`. If the team has its own template, use its sections in place of the skill's template, but keep the header, the Gate status table and the Review log appendix from the skill's template.
 - **The relevant code.** Find the components the change touches: entry points, data models, the interfaces between them, and how similar features were built before. Note file paths; the doc cites them.
+- **Other services.** When the design calls or changes another service, use the `service-map` skill to find that service's real contract, and cite it.
 - **Gaps.** Anything about the current system you could not verify from the code is an assumption and is marked as one.
 
 If there is no repository, work from what the user gives you and say in the context section that the description of the current system is from the user's account.

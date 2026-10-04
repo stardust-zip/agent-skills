@@ -1,6 +1,6 @@
 ---
 name: work-setup
-description: Sets up a work machine so docs never reach the company Git host. Creates ~/work-docs (where the other skills put Markdown on a work machine) as a local Git repository with no remote, and installs a global pre-push hook that blocks any push adding or changing Markdown files. Use when the user sets up a new work machine, asks to install the docs push guard, or a push was blocked by it and they want to know why or how to fix it.
+description: Sets up a work machine so docs never reach the company Git host - creates ~/work-docs and installs a pre-push hook blocking Markdown. Use when setting up the work machine or when that hook blocked a push.
 ---
 
 # Work Setup

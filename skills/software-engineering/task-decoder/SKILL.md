@@ -1,6 +1,6 @@
 ---
 name: task-decoder
-description: Turns a raw conversation or summary of a work assignment into a work plan, which is one or more deliverables (design doc, API docs, ML research, a PR...) in dependency order. Each item names the next skill to run, and the plan comes with questions for the asker. Saves the plan to notes/items/ and updates it as items finish or scope changes. Use whenever the user pastes a chat or meeting notes from a boss, PO or teammate, asks what they are supposed to do, deliver or build, or reports progress or new answers on an existing plan. It plans the work; it does not do it.
+description: Turns a boss's or PO's request (raw chat or summary) into an ordered plan of deliverables, each routed to the skill that does it, plus questions for the asker. Saves and updates the plan as work progresses. Use when the user pastes an assignment, asks what they should deliver, or reports progress on a plan.
 ---
 
 # Task Decoder
@@ -79,27 +79,7 @@ If an audience is still unknown after the interview, infer it and make it a ques
 
 ### 4. List the deliverables
 
-Find every deliverable the goal needs. Use the verbs and the goal together:
-
-| What they said | Usually means | Deliverable | Done looks like |
-|---|---|---|---|
-| "look into", "explore", "investigate", "research" | Spike: reduce uncertainty | Short findings doc (1-2 pages), sometimes a throwaway prototype | A recommendation with evidence, time-boxed |
-| "can we...?", "is it possible to...?" | Feasibility check | Findings doc or small proof of concept | Yes / no / yes-if, with the blocker named |
-| "compare", "evaluate options", "which should we use" | Decision support | Comparison table plus recommendation; benchmark if performance matters | Criteria, options scored, one pick |
-| "design", "propose", "how would we build" | Agreement before building | Design doc / RFC with diagram | Reviewers can approve or object to specifics |
-| "decide", "we chose X, write it down" | Record a decision | ADR (architecture decision record) | Context, decision, consequences in one page |
-| "build", "implement", "add", "fix" | Working code | PR with tests | Merged, or ready for review |
-| "expose", "integrate with", "other teams will call this" | A contract between teams | API spec plus usage docs | Another engineer can call it from the doc alone |
-| "document" | Depends entirely on audience | API docs, README, runbook, or onboarding guide | The named reader can do their job from it |
-| "analyze the data", "what does the data say", "why did X drop" | Evidence for a question | Notebook plus a written summary of findings | The question is answered in plain words, with the charts behind it |
-| "try a model", "train", "fine-tune", "see if ML can do X" | Experiment | Notebook or script, plus an evaluation report against a baseline | A metric, a baseline, and a verdict |
-| "how good is it", "measure quality", "is the model/prompt working" | Evaluation | Eval set plus results report | Numbers on a defined test set, with failure examples |
-| "build a chatbot / assistant / RAG / agent" | AI application | Eval set, prototype, design doc | A demo on real examples and a way to measure it |
-| "demo", "show", "present" | Convince an audience | Working demo and/or slides | Rehearsed, with one clear message |
-| "estimate", "how long", "break it down" | Planning | Task breakdown with estimates and risks | Tickets someone could pick up |
-| "monitor", "track", "report on" | Ongoing visibility | Dashboard or scheduled report | Metrics defined, owner named |
-| "it broke", "what happened" | Explain an incident | Root-cause analysis / postmortem | Timeline, cause, fix, prevention |
-| "make the business case", "is it worth it" | Justify spend | One-pager: problem, cost, benefit, risk | A decision-maker can say yes or no |
+Find every deliverable the goal needs. Look up the wording in `{skill-root}/references/deliverables.md`, which maps phrases like "look into", "expose" or "try a model" to the usual deliverable and what done looks like. Use the verbs and the goal together.
 
 Rules:
 - **One deliverable, one item.** A notebook and its written summary for the same audience are one item. A design doc and the API docs for another team are two.
@@ -154,11 +134,15 @@ List any term from the conversation that sits outside fullstack engineering (ML,
 
 | Deliverable | Skill |
 |---|---|
+| A feature to build where the approach is not settled yet | `feature-brainstorm`, then `design-doc` |
 | Design doc / RFC, or an AI application that needs agreement before building | `design-doc` |
+| Code to write from an approved design doc | `implementation-plan`, then `plan-review` |
 | API reference, integration guide, or an API contract between teams (REST, GraphQL, gRPC, events, webhooks) | `api-docs` |
 | DS/ML research whose output is one of: descriptive analysis, classification, regression, forecasting, anomaly detection | `ds-ml-research` |
 | Setting up a work machine, or a push blocked by the docs guard | `work-setup` |
 | Anything else | No skill yet. Say so, and describe the deliverable in plain words |
+
+When an item involves another service (calling it, integrating with it, designing against it), say so in its hand-off and name `service-map` for finding that service's real contract.
 
 `ds-ml-research` does not cover ranking or search quality, recommendation, clustering, causal inference or LLM evaluation. An item of that kind is "no skill yet", even though it involves data.
 
@@ -171,75 +155,7 @@ For each item routed to `ds-ml-research`, add a Problem Card draft to its hand-o
 
 Write the plan file, then show the user a short version in the chat: the summary, the work plan table, the order, the item to start now, the questions with the ready-to-send message, any Watch out flags, and the file path. Do not paste the full hand-offs into the chat; they are in the file.
 
-Plan file format:
-
-```
-# [Assignment title]
-
-Asked by: [role]   Asked on: [date]   Due: [date or "not stated"]   Plan updated: [date]
-
-## Summary
-[One or two sentences: what the user has to deliver overall, for whom, by when.]
-Confidence: high / medium / low - [one line on why]
-
-## What they actually want
-[The goal behind the ask.]
-
-## What was said vs. what I'm assuming
-Said: [quoted or closely paraphrased facts, including interview answers]
-Assuming: [inferences, each one line]
-
-## Work plan
-| # | Item | Deliverable | For | Skill | Depends on | Stated / inferred | Size | Status |
-|---|---|---|---|---|---|---|---|---|
-| 1 | ... | ... | ... | `ds-ml-research` | — | stated | 3 days | TODO |
-
-Order: [e.g. 1 → 2 → {3, 4}]
-Checkpoints: [items whose result can change later items, and how]
-Start now: item [n] - [why this one]
-
-## Ask before you start
-| # | Question | If no answer, assume | Answer |
-|---|---|---|---|
-Message you can send:
-> [short draft]
-
-## Watch out
-[Only real flags. Omit if none.]
-
-## Terms
-[term - one-line meaning. Omit if none.]
-
-## Hand-offs
-
-### Item [n]: [name]
-Skill: [exact name, or "no skill yet"]
-Uses: [outputs of earlier items this one needs, or "nothing"]
-Done looks like: [2-4 checks]
-Task statement:
-> [Three to five sentences that state this item on its own: goal, deliverable, audience, deadline, done criteria, known constraints. Pasteable into a fresh session or the named skill without this conversation.]
-[Problem Card draft, only for ds-ml-research items:]
-  task_type:                   [descriptive | classification | regression | forecasting | anomaly_detection] (inferred)
-  research_deliverable:        UNKNOWN - ask <role> [wording suggests: ...]
-  business_owner:
-  technical_owner:
-  decision_user:
-  decision_or_action:
-  target_definition:
-  current_process_or_baseline:
-  primary_business_metric:
-  primary_model_metric:
-  success_criteria:
-  stop_criteria:
-  operational_constraints:
-
-## Change log
-- [date] - Plan created.
-```
-
-Item statuses: `TODO`, `IN_PROGRESS`, `DONE`, `BLOCKED` (say on what), `CANCELLED` (say why), `UNCONFIRMED` (an inferred item the asker has not confirmed yet).
-
-Keep it proportionate. A single-item assignment gets a one-row table and one hand-off, and the whole file stays short.
+Use the format in `{skill-root}/references/plan-file.md`, including its item statuses. For a worked example of a multi-item plan, see `references/example.md`.
 
 ## Updating a plan
 
@@ -258,45 +174,3 @@ Then show the user what changed and what to do next.
 ## After the plan
 
 Stop there. Do not begin any item, draft its outline, or create files other than the plan file. The user takes each item's hand-off to its skill when it is that item's turn.
-
-## Example
-
-**Input:** "PO in planning: 'we want to recommend relevant help articles inside the support ticket form, before the customer submits. the KB team will call our service from their frontend. let's target end of quarter. check with Linh in DS whether our ticket data is even usable for this'"
-
-**Interview:** the user says the results go to the PO, there is no existing recommendation code, and they have never built a recommender.
-
-**Plan (abridged):**
-
-## Summary
-Three to four items, ending in a recommendation service that the KB team calls from their frontend, by end of quarter. It starts with a check that the ticket data can support it.
-Confidence: medium - the PO named the outcome and one check, but not the intermediate deliverables.
-
-## Work plan
-| # | Item | Deliverable | For | Skill | Depends on | Stated / inferred | Size | Status |
-|---|---|---|---|---|---|---|---|---|
-| 1 | Data usability check | Notebook plus findings summary | PO, Linh | `ds-ml-research` | — | stated | 3-5 days | TODO |
-| 2 | Recommendation approach and service design | Design doc | Team, KB team | `design-doc` | 1 | inferred | 3 days | UNCONFIRMED |
-| 3 | API contract for the KB team | OpenAPI spec plus usage guide | KB team | `api-docs` | 2 | inferred | 2 days | UNCONFIRMED |
-| 4 | Recommendation quality evaluation | Eval set plus results report | PO | no skill yet (ranking quality) | 1 | inferred | 3 days | UNCONFIRMED |
-
-Order: 1 → {2, 4} → 3, then implementation (not planned yet; depends on 2 and 3)
-Checkpoints: item 1. If the data is not usable, items 2-4 are cancelled and the question goes back to the PO.
-Start now: item 1 - everything else depends on whether the data is usable.
-
-## Ask before you start
-| # | Question | If no answer, assume |
-|---|---|---|
-| 1 | Do you want a design doc and API contract before building, or a prototype first? | Design doc and contract, because another team integrates |
-| 2 | How will we judge "relevant": click-through on the suggestions, fewer tickets submitted, or a labelled test set? | A labelled test set built with Linh |
-
-## Hand-offs
-### Item 1: Data usability check
-Skill: `ds-ml-research`
-Uses: nothing
-Task statement:
-> Determine whether historical support tickets and the help-article catalogue are usable for recommending relevant articles at ticket-creation time. Deliver an analysis notebook and a short findings summary for the PO, with a usable / not usable / usable-if verdict. Coordinate with Linh in DS on data access and quality. Due within the first two weeks of the quarter, since the service design depends on it.
-Problem Card draft:
-  task_type:                   descriptive (inferred: this checks data, it does not build a model)
-  research_deliverable:        UNKNOWN - ask PO [wording suggests: analysis_report]
-  decision_or_action:          whether to proceed with the article recommender
-  success_criteria:            UNKNOWN - ask PO and Linh

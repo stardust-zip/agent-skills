@@ -1,6 +1,6 @@
 ---
 name: api-docs
-description: Writes API documentation for a service, whatever its style (REST/OpenAPI, GraphQL, gRPC/protobuf, events and webhooks): a reference spec, a usage guide, verified examples, and change notes with a breaking-change check, linted with real tools. Works from existing code, an existing spec, or as a spec-first contract. Use when the user asks for API docs, an OpenAPI/proto/GraphQL/AsyncAPI spec, an integration guide, or brings a task-decoder hand-off item routed to api-docs.
+description: Writes API docs for REST, GraphQL, gRPC or event APIs - reference spec, usage guide, verified examples and change notes, linted with real tools. Use for API docs, OpenAPI/proto/GraphQL/AsyncAPI specs, integration guides or API contracts.
 ---
 
 # API Docs
@@ -62,6 +62,8 @@ Load the reference file for each style found.
 - **Nothing built yet**: this is a spec-first contract. The spec is a proposal for the consuming team to agree. Mark it `Status: Draft contract`. If the contract hides real design choices (sync or async, which service owns the data), say so and suggest the `design-doc` skill first.
 
 **House conventions.** Existing docs location and format, a developer portal config (for example `catalog-info.yaml`, `mkdocs.yml`, a docs site), lint configs (`.redocly.yaml`, `.spectral.yaml`, `buf.yaml`, GraphQL lint config), and package scripts that lint or generate specs. Use them over this skill's defaults.
+
+**Consumers and providers.** When the API calls other services or is called by them, use the `service-map` skill to find their real contracts. After documenting, offer to update this service's catalog entry (spec path, environments).
 
 ### 2. Interview the user
 
