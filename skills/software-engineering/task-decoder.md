@@ -25,9 +25,11 @@ Use only what is in the current conversation and the plan file for this assignme
 
 Every plan is saved to `{repo-root}/notes/items/YYYY-MM-DD-<slug>.md`, where `{repo-root}` is the Git root of the current directory, or the current directory if it is not in a repository. The date is the day the assignment was given; the slug is two to five words naming it.
 
-The file holds notes from a conversation with the user's PO or boss, so it must never be committed by accident. After writing it, check with `git check-ignore -q <path>`. If it is not ignored, tell the user, and offer to add `notes/` to `.git/info/exclude`, which ignores it for this clone only and changes nothing the team sees. Do not edit the repository's `.gitignore`.
+**Work machine.** If `~/work-docs/` exists, this is a work machine, and company policy forbids pushing Markdown files to the work Git host. Then the plan goes to `~/work-docs/<repo-name>/notes/items/YYYY-MM-DD-<slug>.md` instead, or `~/work-docs/notes/items/` when not in a repository, and the ignore check below is not needed. Never write the plan inside a repository on a work machine.
 
-Before starting a new plan, list `notes/items/`. If the input looks like it concerns an existing plan, ask whether this is an update to that plan or a new assignment.
+On other machines, the file holds notes from a conversation with the user's PO or boss, so it must never be committed by accident. After writing it, check with `git check-ignore -q <path>`. If it is not ignored, tell the user, and offer to add `notes/` to `.git/info/exclude`, which ignores it for this clone only and changes nothing the team sees. Do not edit the repository's `.gitignore`.
+
+Before starting a new plan, list the plan folder (`notes/items/`, or its `~/work-docs/` equivalent). If the input looks like it concerns an existing plan, ask whether this is an update to that plan or a new assignment.
 
 ## Interview first
 
@@ -155,6 +157,7 @@ List any term from the conversation that sits outside fullstack engineering (ML,
 | Design doc / RFC, or an AI application that needs agreement before building | `design-doc` |
 | API reference, integration guide, or an API contract between teams (REST, GraphQL, gRPC, events, webhooks) | `api-docs` |
 | DS/ML research whose output is one of: descriptive analysis, classification, regression, forecasting, anomaly detection | `ds-ml-research` |
+| Setting up a work machine, or a push blocked by the docs guard | `work-setup` |
 | Anything else | No skill yet. Say so, and describe the deliverable in plain words |
 
 `ds-ml-research` does not cover ranking or search quality, recommendation, clustering, causal inference or LLM evaluation. An item of that kind is "no skill yet", even though it involves data.

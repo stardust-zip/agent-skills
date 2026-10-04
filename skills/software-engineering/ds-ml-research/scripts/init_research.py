@@ -15,6 +15,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from research_lang import LANGUAGES, NARRATIVE_PLACEHOLDER, text
+from topic_paths import markdown_dir
 
 
 SAFE_NAME = re.compile(r"^[a-z0-9][a-z0-9-]*$")
@@ -147,9 +148,11 @@ def main() -> int:
     skill_root = Path(__file__).resolve().parents[1]
     assets = skill_root / "assets" / language
     topic_dir = project_root / "notebooks" / slug
-    if topic_dir.exists():
-        print(f"ERROR: topic already exists: {topic_dir}", file=sys.stderr)
-        return 1
+    md_dir = markdown_dir(project_root, slug)
+    for existing in (topic_dir, md_dir / "research-plan.md"):
+        if existing.exists():
+            print(f"ERROR: topic already exists: {existing}", file=sys.stderr)
+            return 1
 
     created_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
     common = {
@@ -186,8 +189,6 @@ def main() -> int:
     staging = Path(tempfile.mkdtemp(prefix=f".{slug}-", dir=topic_dir.parent))
     try:
         staging.chmod(0o777 & ~current_umask())
-        (staging / "research-plan.md").write_text(plan)
-        (staging / "research-log.md").write_text(log)
         for filename, header in notebooks.items():
             (staging / filename).write_text(
                 json.dumps(notebook_document(header, language), ensure_ascii=False, indent=1)
@@ -198,6 +199,10 @@ def main() -> int:
         shutil.rmtree(staging, ignore_errors=True)
         raise
 
+    md_dir.mkdir(parents=True, exist_ok=True)
+    (md_dir / "research-plan.md").write_text(plan)
+    (md_dir / "research-log.md").write_text(log)
+
     data_root = project_root / "data" / environment / domain
     for layer in ("bronze", "silver", "gold", "manifests"):
         (data_root / layer).mkdir(parents=True, exist_ok=True)
@@ -206,6 +211,8 @@ def main() -> int:
         print(f"Added {data_root / '.gitignore'} so local data is not committed")
 
     print(f"Created research topic: {topic_dir} (language: {language})")
+    if md_dir != topic_dir:
+        print(f"Plan and log (kept outside the repository): {md_dir}")
     print(f"Created data layers: {data_root}")
     print("Current state: G0 NOT_STARTED")
     return 0

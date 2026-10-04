@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# Work-machine guard: refuse to push commits that add or change Markdown
+# files, because company policy forbids pushing docs to the work Git host.
+# Installed as a global hook (core.hooksPath); afterwards it runs the
+# repository's own pre-push hook, if it has one.
+set -euo pipefail
+
+updates=$(cat)
+offending=""
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  if [ -z "${local_ref:-}" ] || [[ "$local_sha" =~ ^0+$ ]]; then
+    continue # empty line, or deleting a remote branch (pushes no content)
+  fi
+  if [[ "$remote_sha" =~ ^0+$ ]]; then
+    # New branch: every commit no remote-tracking branch has yet.
+    commits=$(git rev-list "$local_sha" --not --remotes)
+  else
+    commits=$(git rev-list "$remote_sha..$local_sha")
+  fi
+  for commit in $commits; do
+    files=$(git diff-tree --root --no-commit-id --name-only -r --diff-filter=ACMR "$commit" |
+      grep -iE '\.(md|markdown|mdx)$' || true)
+    if [ -n "$files" ]; then
+      subject=$(git log -1 --format='%h %s' "$commit")
+      offending+=$(printf '%s\n' "$files" | sed "s|\$|   (commit $subject)|")$'\n'
+    fi
+  done
+done <<<"$updates"
+
+if [ -n "$offending" ]; then
+  {
+    echo "Push blocked: these commits add or change Markdown files, and docs must not be"
+    echo "pushed to the work Git host:"
+    echo
+    printf '%s' "$offending" | sed 's/^/  /'
+    echo
+    echo "Move the docs to ~/work-docs/<repo-name>/, remove them from these commits (for"
+    echo "example with an interactive rebase), then push again. If a file is genuinely"
+    echo "allowed, 'git push --no-verify' skips all pre-push hooks."
+  } >&2
+  exit 1
+fi
+
+repo_hook="$(git rev-parse --git-common-dir)/hooks/pre-push"
+if [ -x "$repo_hook" ]; then
+  printf '%s\n' "$updates" | "$repo_hook" "$@"
+fi

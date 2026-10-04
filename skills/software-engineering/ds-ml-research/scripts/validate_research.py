@@ -11,6 +11,7 @@ from collections import Counter
 from pathlib import Path
 
 from research_lang import LANGUAGES, LEGACY_LANGUAGE, text
+from topic_paths import markdown_dir_for_topic
 from writing_checks import cell_text, narrative_issues, soft_break_lines
 
 
@@ -312,11 +313,16 @@ def main() -> int:
     if not topic_dir.is_dir():
         report.error(f"topic directory does not exist: {topic_dir}")
     else:
-        for filename in REQUIRED_FILES:
-            if not (topic_dir / filename).is_file():
-                report.error(f"missing required file: {filename}")
+        md_dir = markdown_dir_for_topic(topic_dir)
 
-        plan = topic_dir / "research-plan.md"
+        def location(filename: str) -> Path:
+            return (md_dir if filename.endswith(".md") else topic_dir) / filename
+
+        for filename in REQUIRED_FILES:
+            if not location(filename).is_file():
+                report.error(f"missing required file: {location(filename)}")
+
+        plan = md_dir / "research-plan.md"
         passed_gates: set[int] = set()
         language = LEGACY_LANGUAGE
         if plan.is_file():
@@ -324,8 +330,8 @@ def main() -> int:
             passed_gates = validate_plan(plan, language, report)
             validate_data_ignored(topic_dir, plan, report)
         for name in ("research-plan.md", "research-log.md"):
-            if (topic_dir / name).is_file():
-                validate_markdown_layout(name, (topic_dir / name).read_text(), report)
+            if (md_dir / name).is_file():
+                validate_markdown_layout(name, (md_dir / name).read_text(), report)
         for filename in REQUIRED_FILES:
             if filename.endswith(".ipynb") and (topic_dir / filename).is_file():
                 validate_notebook(topic_dir / filename, passed_gates, language, report)

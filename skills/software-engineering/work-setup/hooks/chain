@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# A global core.hooksPath stops Git from running the repository's own hooks
+# in .git/hooks. Every hook name except pre-push links to this script, which
+# hands over to the repository's hook so per-repo hooks keep working.
+repo_hook="$(git rev-parse --git-common-dir)/hooks/$(basename "$0")"
+if [ -x "$repo_hook" ]; then
+  exec "$repo_hook" "$@"
+fi

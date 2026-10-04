@@ -20,6 +20,13 @@ The user is a fullstack engineer at a large tech company, fairly new in the role
 - Local `AGENTS.md`, `CLAUDE.md`, and the repo's own doc and lint conventions take precedence over this skill's defaults.
 - Reply to the user in the language they write in. Write the docs in English unless the user says their team documents in another language.
 
+## Work machine: no Markdown in the repository
+
+Check whether `~/work-docs/` exists. If it does, this is a work machine, and company policy forbids pushing Markdown files to the work Git host. Then:
+- Every `.md` file (the usage guide, the changelog) goes to `~/work-docs/<repo-name>/` plus the path it would have had in the repository, for example `~/work-docs/<repo-name>/docs/api/README.md`. Never write a `.md` file inside the repository.
+- Spec files (`openapi.yaml`, `.proto`, `schema.graphql`, `asyncapi.yaml`) and descriptions in code annotations are not Markdown. They stay in the repository as usual.
+- Links from the guide to the spec use the spec's path in the repository, written as text, since the guide no longer sits next to it.
+
 ## Must not invent
 
 Docs that are wrong are worse than docs that are missing, because consumers build on them. Never make up any of these. Take them from code, config or the user, or mark them:
@@ -126,7 +133,7 @@ Do not install tools globally or add dependencies to the project. `npx` download
 
 Follow the repo's convention. Otherwise:
 - Spec next to the code it describes, where tools expect it: `openapi.yaml` at `{service-root}` or `{service-root}/api/`, `.proto` files where they already live, `schema.graphql` at the schema module, `asyncapi.yaml` at `{service-root}`.
-- Guide and changelog in `{service-root}/docs/api/` (`README.md`, `CHANGELOG.md`).
+- Guide and changelog in `{service-root}/docs/api/` (`README.md`, `CHANGELOG.md`), or under `~/work-docs/<repo-name>/docs/api/` on a work machine.
 
 Write the files; do not commit them.
 

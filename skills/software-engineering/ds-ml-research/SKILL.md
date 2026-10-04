@@ -16,6 +16,7 @@ Run DS/ML research through a reproducible, evidence-backed gate system. The cano
 - `{skill-root}` is this skill directory.
 - `{project-root}` is the Git root of the service repository or submodule that owns the data and model (for example `~/projects/example-ml-service`). It is never the umbrella repository that only aggregates submodules; if the current directory is an umbrella root, ask which service repository to use.
 - `{topic-dir}` is `{project-root}/notebooks/<research-slug>`.
+- `{topic-md-dir}` is where the topic's Markdown files (`research-plan.md`, `research-log.md`) live. Normally it is `{topic-dir}`. On a work machine, marked by `~/work-docs/` existing, company policy forbids pushing Markdown to the work Git host, so it is `~/work-docs/<repo-name>/notebooks/<research-slug>` instead. The scripts resolve this themselves (`scripts/topic_paths.py`). This is the one approved exception to the fixed layout in standard section 3: notebooks, code and data stay where the standard puts them. Never write a `.md` file inside the repository on a work machine.
 - Local `AGENTS.md`, `CLAUDE.md`, security rules, and service constraints take precedence for tool and storage choices. They do not waive the research gates, evidence contract, or leakage controls.
 
 ## On Activation
@@ -34,7 +35,7 @@ Run DS/ML research through a reproducible, evidence-backed gate system. The cano
      --language <en|vi>
    ```
 
-5. For an existing topic, read `research-plan.md`, take the topic language from `language:` in section 1, determine the first gate not marked `PASS`, and run the structural validator before changing research artifacts:
+5. For an existing topic, read `{topic-md-dir}/research-plan.md`, take the topic language from `language:` in section 1, determine the first gate not marked `PASS`, and run the structural validator before changing research artifacts:
 
    ```bash
    python -B {skill-root}/scripts/validate_research.py {topic-dir}

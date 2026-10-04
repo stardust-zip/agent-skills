@@ -16,6 +16,10 @@ You have two jobs. Write a doc that reviewers can approve or object to in specif
 - Reply to the user in the language they write in. The doc's language is chosen separately (see the interview) and recorded in its header.
 - In a `vi` doc, write prose in Vietnamese and keep technical terms, gate IDs, statuses and code identifiers in English.
 
+## Work machine: no Markdown in the repository
+
+Check whether `~/work-docs/` exists. If it does, this is a work machine, and company policy forbids pushing Markdown files to the work Git host. Then the design doc goes to `~/work-docs/<repo-name>/` plus the path it would have had in the repository, for example `~/work-docs/<repo-name>/docs/design/2026-10-04-order-sync.md`. Never write a `.md` file inside the repository on a work machine. Diagrams stay as Mermaid blocks inside the doc, so nothing else needs to move.
+
 ## Input
 
 One of:
@@ -76,7 +80,7 @@ Scale the doc to the change:
 
 If you are running inside a repository, read before you ask or write.
 
-- **House style.** Look for existing design docs, RFCs or ADRs (commonly `docs/design/`, `docs/rfcs/`, `docs/architecture/`, `docs/adr/`, `rfcs/`) and for a template file. If the team has its own template, use its sections in place of the skill's template, but keep the header, the Gate status table and the Review log appendix from the skill's template.
+- **House style.** Look for existing design docs, RFCs or ADRs (commonly `docs/design/`, `docs/rfcs/`, `docs/architecture/`, `docs/adr/`, `rfcs/`) and for a template file, both in the repository and, on a work machine, in `~/work-docs/<repo-name>/`. If the team has its own template, use its sections in place of the skill's template, but keep the header, the Gate status table and the Review log appendix from the skill's template.
 - **The relevant code.** Find the components the change touches: entry points, data models, the interfaces between them, and how similar features were built before. Note file paths; the doc cites them.
 - **Gaps.** Anything about the current system you could not verify from the code is an assumption and is marked as one.
 
@@ -119,7 +123,7 @@ Writing rules:
 - Write for a reviewer who knows the company's systems but was not in the conversations. Define terms new to the codebase.
 - Plain sentences. If a cross-cutting item has nothing real under it, drop it.
 
-Where it goes: follow the repository's convention if there is one; otherwise `docs/design/YYYY-MM-DD-short-title.md`. Write the file; do not commit it.
+Where it goes: follow the repository's convention if there is one; otherwise `docs/design/YYYY-MM-DD-short-title.md`. On a work machine, put that path under `~/work-docs/<repo-name>/` (see above). Write the file; do not commit it.
 
 Then update the gate table per the gate rules.
 
