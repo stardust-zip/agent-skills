@@ -5,7 +5,7 @@ description: Sets up a work machine so docs never reach the company Git host - c
 
 # Work Setup
 
-`{skill-root}` is the folder containing this SKILL.md. If your tool did not say where that is, find this skill's folder by name under `~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills`, `~/.gemini/antigravity-cli/skills` or `~/.config/opencode/skills/software-engineering`.
+`{skill-root}` is the folder containing this SKILL.md. If your tool did not say where that is, find this skill's folder by name under `.claude/skills` in the current repository, `~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills`, `~/.gemini/antigravity-cli/skills` or `~/.config/opencode/skills/software-engineering`.
 
 The user's company forbids pushing docs (Markdown files) to its internal Git host. Committing locally is allowed, but a local commit can be pushed by accident. The user does work on a separate work machine and personal projects elsewhere, with the same skills on both.
 

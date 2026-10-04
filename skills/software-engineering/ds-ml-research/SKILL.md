@@ -13,7 +13,7 @@ Run DS/ML research through a reproducible, evidence-backed gate system. The cano
 
 ## Conventions
 
-- `{skill-root}` is the folder containing this SKILL.md. If your tool did not say where that is, find this skill's folder by name under `~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills`, `~/.gemini/antigravity-cli/skills` or `~/.config/opencode/skills/software-engineering`.
+- `{skill-root}` is the folder containing this SKILL.md. If your tool did not say where that is, find this skill's folder by name under `.claude/skills` in the current repository, `~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills`, `~/.gemini/antigravity-cli/skills` or `~/.config/opencode/skills/software-engineering`.
 - `{project-root}` is the Git root of the service repository or submodule that owns the data and model (for example `~/projects/example-ml-service`). It is never the umbrella repository that only aggregates submodules; if the current directory is an umbrella root, ask which service repository to use.
 - `{topic-dir}` is `{project-root}/notebooks/<research-slug>`.
 - `{topic-md-dir}` is where the topic's Markdown files (`research-plan.md`, `research-log.md`) live. Normally it is `{topic-dir}`. On a work machine, marked by `~/work-docs/` existing, company policy forbids pushing Markdown to the work Git host, so it is `~/work-docs/<repo-name>/notebooks/<research-slug>` instead. The scripts resolve this themselves (`scripts/topic_paths.py`). This is the one approved exception to the fixed layout in standard section 3: notebooks, code and data stay where the standard puts them. Never write a `.md` file inside the repository on a work machine.

@@ -9,7 +9,7 @@ The user is a fullstack engineer at a large tech company, fairly new in the role
 
 ## Conventions
 
-- `{skill-root}` is the folder containing this SKILL.md. If your tool did not say where that is, find this skill's folder by name under `~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills`, `~/.gemini/antigravity-cli/skills` or `~/.config/opencode/skills/software-engineering`.
+- `{skill-root}` is the folder containing this SKILL.md. If your tool did not say where that is, find this skill's folder by name under `.claude/skills` in the current repository, `~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills`, `~/.gemini/antigravity-cli/skills` or `~/.config/opencode/skills/software-engineering`.
 - `{service-root}` is the Git root of the service that owns the API. If the current directory is an umbrella repo that only aggregates services, ask which service to document.
 - Style references, loaded only for the styles actually present:
   - REST / HTTP: `references/rest-openapi.md`

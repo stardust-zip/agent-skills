@@ -10,12 +10,13 @@ Reference notes are for looking things up while working: commands, syntax, steps
 ## The vault
 
 - **Work machine** (`~/work-docs/` exists): `~/work-docs/notebook/notes/`, never synced. Examples may use the user's real services (via `service-map`).
-- **Personal machines:** `<vault>/notes/`, where `<vault>` is the first that exists of `$NOTEBOOK_DIR`, `~/notebook` (the phone) and `~/projects/gitea/gitkeeper/notebook` (the laptop). If none exists, ask where the notebook clone is. Never write company details here; keep internal systems generic.
+- **Personal machines:** `<vault>/notes/`, where `<vault>` is the first that exists of: the current Git repository, if it is the vault (its root has `notes/` and an `AGENTS.md` that describes `cards/` and learning notes), which is the case in a cloud session from the Claude app; `$NOTEBOOK_DIR`; `~/notebook` (the phone); `~/projects/gitea/gitkeeper/notebook` (the laptop). If none exists, ask where the notebook clone is. Never write company details here; keep internal systems generic.
 
 On personal machines:
 - **Sync only when the user agrees.** Before touching the vault, ask whether to pull the latest version first (pull, or work locally), in the same question batch as the other setup questions rather than as a round of its own. At the end, ask what to do with the changes: commit and push, commit only, or leave uncommitted.
 - When committing, stage only the files you touched, with the repo's convention: `note-creation: <topic>` for a new note, `note-update: <topic>` otherwise.
 - Git may ask for a password, which this session cannot type. If a pull or push fails that way, say so in one line, keep working locally, and suggest the user run the same command themselves with a leading `!`. Never retry in a loop, and never force-push.
+- In a cloud session (Claude Code on the web or in the Claude app) the repository is a fresh clone, so skip the pull question. At the end, still ask before committing, then follow the session's own git workflow; it may push to a branch of its own for the user to merge.
 
 ## What to write
 

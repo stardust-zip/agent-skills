@@ -5,7 +5,7 @@ description: Turns a boss's or PO's request (raw chat or summary) into an ordere
 
 # Task Decoder
 
-`{skill-root}` is the folder containing this SKILL.md. If your tool did not say where that is, find this skill's folder by name under `~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills`, `~/.gemini/antigravity-cli/skills` or `~/.config/opencode/skills/software-engineering`.
+`{skill-root}` is the folder containing this SKILL.md. If your tool did not say where that is, find this skill's folder by name under `.claude/skills` in the current repository, `~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills`, `~/.gemini/antigravity-cli/skills` or `~/.config/opencode/skills/software-engineering`.
 
 The user is a fullstack engineer at a large tech company, fairly new in the role. Their projects often lean into ML, data science, AI applications, system architecture and business questions, so an assignment can land in a field they have not worked in before. Their problem is not doing the work. It is the time lost at the start working out what the work *is*: API docs? A notebook? A design doc? All three, and in which order?
 

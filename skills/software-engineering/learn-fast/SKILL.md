@@ -5,7 +5,7 @@ description: Evidence-based tutor for picking up a new field fast - placement ch
 
 # Learn Fast
 
-`{skill-root}` is the folder containing this SKILL.md. If your tool did not say where that is, find this skill's folder by name under `~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills`, `~/.gemini/antigravity-cli/skills` or `~/.config/opencode/skills/software-engineering`.
+`{skill-root}` is the folder containing this SKILL.md. If your tool did not say where that is, find this skill's folder by name under `.claude/skills` in the current repository, `~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills`, `~/.gemini/antigravity-cli/skills` or `~/.config/opencode/skills/software-engineering`.
 
 The user is a fullstack engineer whose work keeps landing in new fields (ML, data science, architecture, business). They need working knowledge fast and must recognise when they are being handed something wrong.
 
@@ -20,10 +20,11 @@ This skill follows what learning research supports, and avoids what it does not:
 Records live in the user's note vault, the same one `note-coach` uses. Each machine keeps its own vault; nothing is ever copied from the work machine to a personal one, or the other way.
 
 - **Work machine** (`~/work-docs/` exists): `~/work-docs/notebook/`. No sync. Examples may use the user's real services (via `service-map`).
-- **Personal machines:** the first that exists of `$NOTEBOOK_DIR`, `~/notebook` (the phone) and `~/projects/gitea/gitkeeper/notebook` (the laptop): one private git repository cloned on both. If none exists, ask the user where their notebook clone is (and suggest setting `NOTEBOOK_DIR`); never create a new vault silently.
+- **Personal machines:** the first that exists of: the current Git repository, if it is the vault (its root has `notes/` and an `AGENTS.md` that describes `cards/` and learning notes), which is the case in a cloud session from the Claude app; `$NOTEBOOK_DIR`; `~/notebook` (the phone); `~/projects/gitea/gitkeeper/notebook` (the laptop): one private git repository cloned on both. If none exists, ask the user where their notebook clone is (and suggest setting `NOTEBOOK_DIR`); never create a new vault silently.
   - **Sync only when the user agrees.** Before touching the vault, ask whether to pull the latest version first (pull, or work locally), in the same question batch as the other setup questions rather than as a round of its own. At the end, ask what to do with the changes: commit and push, commit only, or leave uncommitted.
   - When committing, stage only the files you touched, with the repo's convention: `note-creation: <topic>` for a new note, `note-update: <topic>` otherwise.
   - Git may ask for a password, which this session cannot type. If a pull or push fails that way, say so in one line, keep working locally, and suggest the user run the same command themselves with a leading `!`. Never retry in a loop, and never force-push.
+  - In a cloud session (Claude Code on the web or in the Claude app) the repository is a fresh clone, so skip the pull question. At the end, still ask before committing, then follow the session's own git workflow; it may push to a branch of its own for the user to merge.
   - **No company details.** Use public knowledge only. If the user mentions an internal system, keep it generic ("your company's file-storage wrapper") and never write internal names, data or designs into the vault.
 
 Per topic, two files with the same domain-prefixed base name (`compsci-vector-databases`):

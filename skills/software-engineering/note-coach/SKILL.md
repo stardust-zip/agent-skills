@@ -5,7 +5,7 @@ description: Coaches the user to write short learning notes from memory in their
 
 # Note Coach
 
-`{skill-root}` is the folder containing this SKILL.md. If your tool did not say where that is, find this skill's folder by name under `~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills`, `~/.gemini/antigravity-cli/skills` or `~/.config/opencode/skills/software-engineering`.
+`{skill-root}` is the folder containing this SKILL.md. If your tool did not say where that is, find this skill's folder by name under `.claude/skills` in the current repository, `~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills`, `~/.gemini/antigravity-cli/skills` or `~/.config/opencode/skills/software-engineering`.
 
 The user keeps a personal vault of Markdown notes. Notes written for them by an AI were read once and forgotten, so this skill never writes a learning note for them. The research is consistent: generating beats reading (generation effect), explaining to yourself beats being told (self-explanation), writing from memory beats building notes from the source (Karpicke & Blunt, 2011), comparing cases builds transferable understanding (Gentner et al., 2003), and notes pay off when they are revisited (reviewing helps more than taking them). The note's value is in the user writing it.
 
@@ -16,7 +16,7 @@ Two kinds of notes live in the vault:
 ## The vault
 
 - **Work machine** (`~/work-docs/` exists): `~/work-docs/notebook/`, never synced.
-- **Personal machines:** the first that exists of `$NOTEBOOK_DIR`, `~/notebook` (the phone) and `~/projects/gitea/gitkeeper/notebook` (the laptop). If none exists, ask the user where their notebook clone is (and suggest setting `NOTEBOOK_DIR`); never create a new vault silently.
+- **Personal machines:** the first that exists of: the current Git repository, if it is the vault (its root has `notes/` and an `AGENTS.md` that describes `cards/` and learning notes), which is the case in a cloud session from the Claude app; `$NOTEBOOK_DIR`; `~/notebook` (the phone); `~/projects/gitea/gitkeeper/notebook` (the laptop). If none exists, ask the user where their notebook clone is (and suggest setting `NOTEBOOK_DIR`); never create a new vault silently.
 
 Layout: flat `notes/` (one Markdown file per topic, YAML frontmatter) and flat `cards/` (review cards, one TSV per topic, same base name as the note). File names are domain-prefixed like the existing ones (`compsci-object-storage`); reuse the existing note for a topic rather than creating a second one.
 
@@ -24,6 +24,7 @@ On personal machines:
 - **Sync only when the user agrees.** Before touching the vault, ask whether to pull the latest version first (pull, or work locally), in the same question batch as the other setup questions rather than as a round of its own. At the end, ask what to do with the changes: commit and push, commit only, or leave uncommitted.
 - When committing, stage only the files you touched, with the repo's convention: `note-creation: <topic>` for a new note, `note-update: <topic>` otherwise.
 - Git may ask for a password, which this session cannot type. If a pull or push fails that way, say so in one line, keep working locally, and suggest the user run the same command themselves with a leading `!`. Never retry in a loop, and never force-push.
+- In a cloud session (Claude Code on the web or in the Claude app) the repository is a fresh clone, so skip the pull question. At the end, still ask before committing, then follow the session's own git workflow; it may push to a branch of its own for the user to merge.
 - **No company details.** If the user mentions an internal system, keep it generic and never write internal names, data or designs into the vault.
 
 ## Asking
