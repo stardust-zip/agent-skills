@@ -20,7 +20,7 @@ This skill follows what learning research supports, and avoids what it does not:
 Records live in the user's note vault, the same one `note-coach` uses. Each machine keeps its own vault; nothing is ever copied from the work machine to a personal one, or the other way.
 
 - **Work machine** (`~/work-docs/` exists): `~/work-docs/notebook/`. No sync. Examples may use the user's real services (via `service-map`).
-- **Personal machines:** `$NOTEBOOK_DIR` if set, otherwise `~/projects/gitea/gitkeeper/notebook`, a private git repository shared by the personal laptop and phone. If neither exists, ask the user where their notebook clone is (and suggest setting `NOTEBOOK_DIR`); never create a new vault silently.
+- **Personal machines:** the first that exists of `$NOTEBOOK_DIR`, `~/notebook` (the phone) and `~/projects/gitea/gitkeeper/notebook` (the laptop): one private git repository cloned on both. If none exists, ask the user where their notebook clone is (and suggest setting `NOTEBOOK_DIR`); never create a new vault silently.
   - Before a session: `git -C <vault> pull --rebase --autostash`.
   - After it: stage only the files the session touched, commit with the repo's convention (`note-creation: <topic>` for a new note, `note-update: <topic>` otherwise), and push.
   - If a pull or push fails, say so and keep the changes local. Never force-push.

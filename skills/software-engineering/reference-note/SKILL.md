@@ -10,7 +10,7 @@ Reference notes are for looking things up while working: commands, syntax, steps
 ## The vault
 
 - **Work machine** (`~/work-docs/` exists): `~/work-docs/notebook/notes/`, never synced. Examples may use the user's real services (via `service-map`).
-- **Personal machines:** `$NOTEBOOK_DIR/notes/` if set, otherwise `~/projects/gitea/gitkeeper/notebook/notes/`. If neither exists, ask where the notebook clone is. Never write company details here; keep internal systems generic.
+- **Personal machines:** `<vault>/notes/`, where `<vault>` is the first that exists of `$NOTEBOOK_DIR`, `~/notebook` (the phone) and `~/projects/gitea/gitkeeper/notebook` (the laptop). If none exists, ask where the notebook clone is. Never write company details here; keep internal systems generic.
 
 On personal machines, pull before writing (`git -C <vault> pull --rebase --autostash`), then stage only the new or changed notes, commit as `note-creation: <topic>` or `note-update: <topic>`, and push. If pull or push fails, keep the change local and say so; never force-push.
 

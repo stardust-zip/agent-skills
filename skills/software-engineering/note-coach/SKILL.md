@@ -16,7 +16,7 @@ Two kinds of notes live in the vault:
 ## The vault
 
 - **Work machine** (`~/work-docs/` exists): `~/work-docs/notebook/`, never synced.
-- **Personal machines:** `$NOTEBOOK_DIR` if set, otherwise `~/projects/gitea/gitkeeper/notebook`. If neither exists, ask the user where their notebook clone is (and suggest setting `NOTEBOOK_DIR`); never create a new vault silently.
+- **Personal machines:** the first that exists of `$NOTEBOOK_DIR`, `~/notebook` (the phone) and `~/projects/gitea/gitkeeper/notebook` (the laptop). If none exists, ask the user where their notebook clone is (and suggest setting `NOTEBOOK_DIR`); never create a new vault silently.
 
 Layout: flat `notes/` (one Markdown file per topic, YAML frontmatter) and flat `cards/` (review cards, one TSV per topic, same base name as the note). File names are domain-prefixed like the existing ones (`compsci-object-storage`); reuse the existing note for a topic rather than creating a second one.
 
