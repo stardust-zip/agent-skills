@@ -35,9 +35,10 @@ bash {skill-root}/scripts/cards.sh show <cards.tsv> <id>        # reveal one ans
 bash {skill-root}/scripts/cards.sh grade <cards.tsv> <id> again|hard|good
 bash {skill-root}/scripts/cards.sh stats <vault>/cards/*.tsv
 bash {skill-root}/scripts/cards.sh notes-due <vault>/notes      # learning notes due for a rewrite
+bash {skill-root}/scripts/cards.sh notes-stale <vault>/notes    # learning notes not reviewed for 60 days
 ```
 
-Old notes in the archived `bronze-notebook` (`~/projects/gitea/gitkeeper/bronze-notebook`, personal machines only) may be used as source material for a session, never as evidence that the user knows a topic, and are never edited.
+Old notes in the archived `bronze-notebook` (personal machines only) may be used as source material for a session, never as evidence that the user knows a topic, and are never edited. Find them with `bash {skill-root}/scripts/bronze.sh <term>...`, which matches file names and frontmatter and skips journal and literature notes. Read only the notes you use.
 
 When a level check passes at level 3 or higher, set the note's `status` to `green`. Set `level` to the highest level recorded as `placed` or `known`.
 
@@ -94,7 +95,7 @@ Pick the mode from the request; ask only if unclear.
 3. For a card, one at a time: show the question, wait for the answer and confidence, then `show` the answer, give one line of feedback, and `grade`. A `NOTE:` card hands over to `note-coach` to write that note; grade it `good` once written, `hard` if postponed again.
 4. For a note rewrite, hand over to `note-coach`'s rewrite-from-memory mode, then continue.
 5. At most about twenty items; stop early if the user wants.
-6. Close with `cards.sh stats` and the calibration line. If most misses sit at one level, mark that level `learning` again in the note and suggest a full session.
+6. Close with `cards.sh stats`, any `notes-stale` notes (offer a rewrite next time), and the calibration line. If most misses sit at one level, mark that level `learning` again in the note and suggest a full session.
 
 ## After any session
 

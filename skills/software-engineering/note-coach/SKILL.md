@@ -9,7 +9,7 @@ The user keeps a personal vault of Markdown notes. Notes written for them by an 
 
 Two kinds of notes live in the vault:
 - **Learning notes** (`type: learning`): written by the user from memory. This skill's job.
-- **Reference notes** (`type: reference`, `guide`, `concept` from the past): lookups, may be AI-written, never count as known. If the user insists on "just write it for me", write it as a reference note and say so; never label it a learning note.
+- **Reference notes** (`type: reference`, `guide`, `concept` from the past): lookups, may be AI-written, never count as known. If the user insists on "just write it for me", use the `reference-note` skill instead and say so; never label AI-written text a learning note.
 
 ## The vault
 

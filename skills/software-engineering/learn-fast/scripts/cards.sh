@@ -26,6 +26,7 @@ usage: cards.sh add <cards.tsv> <level 1-4> <question> <answer> [source]
        cards.sh grade <cards.tsv> <id> again|hard|good
        cards.sh stats <cards.tsv>...          total, due and per-box counts
        cards.sh notes-due <notes-dir>         learning notes due for a rewrite from memory
+       cards.sh notes-stale <notes-dir> [days] learning notes not reviewed for days (default 60)
 EOF
   exit 2
 }
@@ -127,6 +128,21 @@ case "$cmd" in
       due=$(date -d "${last:-$today} + $days day" +%F 2>/dev/null) || due="$today"
       if [[ "$due" < "$today" || "$due" == "$today" ]]; then
         printf '%s\t%s\tlast reviewed %s\n' "$(basename "$note" .md)" "${status:-seed}" "${last:-never}"
+      fi
+    done
+    ;;
+
+  notes-stale)
+    [ $# -ge 1 ] || usage
+    days="${2:-60}"
+    cutoff=$(date -d "$today - $days day" +%F)
+    for note in "$1"/*.md; do
+      [ -f "$note" ] || continue
+      [ "$(frontmatter "$note" type)" = learning ] || continue
+      last=$(frontmatter "$note" last_reviewed)
+      [ -n "$last" ] || last=$(frontmatter "$note" created)
+      if [ -z "$last" ] || [[ "$last" < "$cutoff" ]]; then
+        printf '%s\tlast reviewed %s\n' "$(basename "$note" .md)" "${last:-never}"
       fi
     done
     ;;
