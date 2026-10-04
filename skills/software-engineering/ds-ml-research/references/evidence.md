@@ -1,32 +1,32 @@
 # Evidence Registry and Traceability
 
-File này chỉ được tải khi audit nguồn, sửa/thêm standard hoặc giải thích cơ sở bằng chứng. Luồng nghiên cứu thông thường dùng rule ID trong `standard.md` mà không tải danh sách nguồn.
+Load this file only when auditing sources, changing or adding to the standard, or explaining the evidence behind a rule. The normal research flow uses the rule IDs in `standard.md` without loading the source list.
 
-Chỉ dùng nguồn gốc chính thức, tài liệu của công cụ hoặc nghiên cứu gốc.
+Use only primary sources: official guidance, tool documentation or original research.
 
 ## Evidence registry
 
-| ID | Nguồn | Phạm vi bằng chứng |
+| ID | Source | What it supports |
 |---|---|---|
-| E01 | [Google Rules of Machine Learning](https://developers.google.com/machine-learning/guides/rules-of-ml) | objective/metric trước, pipeline đáng tin cậy, model đầu tiên đơn giản |
-| E02 | [Sandve et al., Ten Simple Rules for Reproducible Computational Research](https://journals.plos.org/ploscompbiol/article?id=10.1371%2Fjournal.pcbi.1003285) | truy vết claim tới dữ liệu, code, tham số và kết quả |
-| E03 | [NIST AI Risk Management Framework 1.0](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf) | tính hợp lệ, tin cậy, minh bạch, an toàn và quản trị rủi ro |
-| E04 | [Gebru et al., Datasheets for Datasets](https://doi.org/10.48550/ARXIV.1803.09010) | nguồn gốc, thành phần, quá trình tạo và giới hạn dataset |
-| E05 | [Scikit-learn: Cross-validation và TimeSeriesSplit](https://scikit-learn.org/stable/modules/cross_validation.html#time-series-split) | split theo thời gian và đánh giá trên tương lai |
-| E06 | [Scikit-learn: Common pitfalls và data leakage](https://scikit-learn.org/stable/common_pitfalls.html#data-leakage) | split trước preprocessing; fit transformation chỉ trên train |
-| E07 | [Google: Implementing a model](https://developers.google.com/machine-learning/problem-framing/implement-model) | pipeline và baseline đơn giản trước model phức tạp |
-| E08 | [Hyndman & Athanasopoulos, Forecasting: Principles and Practice](https://otexts.com/fpp2/simple-methods.html) | mean, naive và seasonal-naive forecasting baseline |
-| E09 | [Schmidl et al., Anomaly Detection in Time Series: A Comprehensive Evaluation](https://www.vldb.org/pvldb/vol15/p1779-wenig.pdf) | so sánh nhiều họ anomaly detector về effectiveness, efficiency và robustness |
-| E10 | [Breck et al., The ML Test Score](https://research.google/pubs/the-ml-test-score-a-rubric-for-ml-production-readiness-and-technical-debt-reduction/) | test feature/data/model/serving và monitoring cho production readiness |
-| E11 | [Mitchell et al., Model Cards for Model Reporting](https://research.google/pubs/model-cards-for-model-reporting/) | intended use, giới hạn, dữ liệu và metric theo nhóm |
-| E12 | [Rule et al., Ten Simple Rules for Reproducible Research in Jupyter Notebooks](https://arxiv.org/abs/1810.08055) | dependency, thứ tự thực thi, khả năng chạy lại notebook; kể câu chuyện cho người đọc và ghi lại quá trình, không chỉ kết quả |
-| E13 | [MLflow Tracking](https://mlflow.org/docs/latest/ml/tracking) | một implementation tham chiếu cho việc log run, code version, dataset, parameter, metric và artifact |
-| E14 | [Tatbul et al., Precision and Recall for Time Series](https://papers.nips.cc/paper_files/paper/2018/hash/8f468c873a32bb0619eaeb2050ba45d1-Abstract.html) | đánh giá anomaly dạng khoảng/sự kiện thay vì chỉ từng điểm |
-| E15 | [NeurIPS Paper Checklist](https://neurips.cc/public/guides/PaperChecklist) | assumptions, error bars, compute, reproducibility và giới hạn claim |
-| E16 | [Sculley et al., Hidden Technical Debt in ML Systems](https://papers.neurips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems.pdf) | data dependency, feedback loop, configuration và pipeline debt |
-| E17 | [Saito & Rehmsmeier, Precision-Recall for imbalanced classification](https://doi.org/10.1371/journal.pone.0118432) | PR curve phản ánh positive prediction tốt hơn ROC khi class imbalance mạnh |
-| E18 | [Gneiting & Raftery, Strictly Proper Scoring Rules](https://doi.org/10.1198/016214506000001437) | Brier/log score cho dự báo xác suất |
-| E19 | [Taschuk & Wilson, Robust Research Software](https://journals.plos.org/ploscompbiol/article?id=10.1371%2Fjournal.pcbi.1005412) | code nghiên cứu chạy được ngoài máy tác giả |
+| E01 | [Google Rules of Machine Learning](https://developers.google.com/machine-learning/guides/rules-of-ml) | objective and metric first, a reliable pipeline, a simple first model |
+| E02 | [Sandve et al., Ten Simple Rules for Reproducible Computational Research](https://journals.plos.org/ploscompbiol/article?id=10.1371%2Fjournal.pcbi.1003285) | tracing claims to data, code, parameters and results |
+| E03 | [NIST AI Risk Management Framework 1.0](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf) | validity, reliability, transparency, safety and risk governance |
+| E04 | [Gebru et al., Datasheets for Datasets](https://doi.org/10.48550/ARXIV.1803.09010) | dataset provenance, composition, collection process and limitations |
+| E05 | [Scikit-learn: Cross-validation and TimeSeriesSplit](https://scikit-learn.org/stable/modules/cross_validation.html#time-series-split) | splitting by time and evaluating on the future |
+| E06 | [Scikit-learn: Common pitfalls and data leakage](https://scikit-learn.org/stable/common_pitfalls.html#data-leakage) | split before preprocessing; fit transformations on train only |
+| E07 | [Google: Implementing a model](https://developers.google.com/machine-learning/problem-framing/implement-model) | a simple pipeline and baseline before a complex model |
+| E08 | [Hyndman & Athanasopoulos, Forecasting: Principles and Practice](https://otexts.com/fpp2/simple-methods.html) | mean, naive and seasonal-naive forecasting baselines |
+| E09 | [Schmidl et al., Anomaly Detection in Time Series: A Comprehensive Evaluation](https://www.vldb.org/pvldb/vol15/p1779-wenig.pdf) | comparing anomaly-detector families on effectiveness, efficiency and robustness |
+| E10 | [Breck et al., The ML Test Score](https://research.google/pubs/the-ml-test-score-a-rubric-for-ml-production-readiness-and-technical-debt-reduction/) | feature, data, model and serving tests and monitoring for production readiness |
+| E11 | [Mitchell et al., Model Cards for Model Reporting](https://research.google/pubs/model-cards-for-model-reporting/) | intended use, limitations, data and metrics by group |
+| E12 | [Rule et al., Ten Simple Rules for Reproducible Research in Jupyter Notebooks](https://arxiv.org/abs/1810.08055) | dependencies, execution order and rerunnable notebooks; telling the reader a story and recording the process, not just the results |
+| E13 | [MLflow Tracking](https://mlflow.org/docs/latest/ml/tracking) | a reference implementation for logging runs, code version, dataset, parameters, metrics and artifacts |
+| E14 | [Tatbul et al., Precision and Recall for Time Series](https://papers.nips.cc/paper_files/paper/2018/hash/8f468c873a32bb0619eaeb2050ba45d1-Abstract.html) | evaluating range or event anomalies instead of single points only |
+| E15 | [NeurIPS Paper Checklist](https://neurips.cc/public/guides/PaperChecklist) | assumptions, error bars, compute, reproducibility and the limits of claims |
+| E16 | [Sculley et al., Hidden Technical Debt in ML Systems](https://papers.neurips.cc/paper/5656-hidden-technical-debt-in-machine-learning-systems.pdf) | data dependencies, feedback loops, configuration and pipeline debt |
+| E17 | [Saito & Rehmsmeier, Precision-Recall for imbalanced classification](https://doi.org/10.1371/journal.pone.0118432) | PR curves reflect positive predictions better than ROC under strong class imbalance |
+| E18 | [Gneiting & Raftery, Strictly Proper Scoring Rules](https://doi.org/10.1198/016214506000001437) | Brier and log scores for probabilistic forecasts |
+| E19 | [Taschuk & Wilson, Robust Research Software](https://journals.plos.org/ploscompbiol/article?id=10.1371%2Fjournal.pcbi.1005412) | research code that runs outside the author's machine |
 
 ## Traceability matrix
 

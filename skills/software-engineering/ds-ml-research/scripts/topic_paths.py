@@ -1,4 +1,4 @@
-"""Where a research topic's Markdown files live.
+"""Where a research topic's files live, and which notebooks it needs.
 
 Notebooks always live in {project-root}/notebooks/<slug>/. The Markdown files
 (research-plan.md, research-log.md) live there too, except on a work machine,
@@ -35,3 +35,15 @@ def markdown_dir_for_topic(topic_dir: Path) -> Path:
     if toplevel.returncode != 0:
         return topic_dir
     return markdown_dir(Path(toplevel.stdout.strip()), topic_dir.name)
+
+
+TARGET_GATES = ("G2", "G3", "G4", "G5", "G6")
+
+
+def gate_number(gate: str) -> int:
+    return int(gate.removeprefix("G"))
+
+
+def required_by(target_gate: str, notebook_gate: str) -> bool:
+    """A notebook is required when its gate is at or before the target gate."""
+    return gate_number(notebook_gate) <= gate_number(target_gate)

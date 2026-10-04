@@ -15,7 +15,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from research_lang import LANGUAGES, NARRATIVE_PLACEHOLDER, text
-from topic_paths import markdown_dir
+from topic_paths import TARGET_GATES, markdown_dir, required_by
 
 
 SAFE_NAME = re.compile(r"^[a-z0-9][a-z0-9-]*$")
@@ -126,6 +126,12 @@ def parse_args() -> argparse.Namespace:
         choices=LANGUAGES,
         help="prose language of the research artifacts; technical terms stay in English",
     )
+    parser.add_argument(
+        "--target-gate",
+        required=True,
+        choices=TARGET_GATES,
+        help="last gate the research is planned to reach; only its notebooks are created",
+    )
     return parser.parse_args()
 
 
@@ -160,6 +166,7 @@ def main() -> int:
         "ENVIRONMENT": environment,
         "DOMAIN": domain,
         "CREATED_AT_UTC": created_at,
+        "TARGET_GATE": args.target_gate,
     }
 
     header_template = (assets / "notebook-header.md").read_text()
@@ -180,6 +187,7 @@ def main() -> int:
                 },
             )
             for filename, number, title, gate in NOTEBOOKS
+            if required_by(args.target_gate, gate)
         }
     except ValueError as error:
         print(f"ERROR: {error}", file=sys.stderr)
@@ -210,7 +218,7 @@ def main() -> int:
         (data_root / ".gitignore").write_text("*\n!.gitignore\n")
         print(f"Added {data_root / '.gitignore'} so local data is not committed")
 
-    print(f"Created research topic: {topic_dir} (language: {language})")
+    print(f"Created research topic: {topic_dir} (language: {language}, target gate: {args.target_gate})")
     if md_dir != topic_dir:
         print(f"Plan and log (kept outside the repository): {md_dir}")
     print(f"Created data layers: {data_root}")

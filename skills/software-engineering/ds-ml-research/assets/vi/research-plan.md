@@ -21,7 +21,7 @@ research_slug: {{RESEARCH_SLUG}}
 language: vi
 status: NOT_STARTED
 current_gate: G0
-target_gate: G0
+target_gate: {{TARGET_GATE}}
 created_at_utc: {{CREATED_AT_UTC}}
 ```
 

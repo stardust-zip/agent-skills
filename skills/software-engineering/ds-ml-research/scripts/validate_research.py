@@ -63,6 +63,26 @@ PROBLEM_FIELDS = (
     "approval",
 )
 DELIVERABLES = ("feasibility_poc", "model_selection", "analysis_report")
+# Problem Card fields that may be `not_applicable (<reason>)`, per task_type
+# (standard section 6, rule 2).
+NOT_APPLICABLE_ALLOWED = {
+    "descriptive": {
+        "scoring_time",
+        "feature_cutoff_time",
+        "target_definition",
+        "label_available_time",
+        "prediction_horizon",
+        "false_positive_cost",
+        "false_negative_cost",
+        "primary_model_metric",
+    },
+    "classification": {"prediction_horizon"},
+    "regression": {"prediction_horizon"},
+    "anomaly_detection": {"label_available_time"},
+    "forecasting": set(),
+}
+NOT_APPLICABLE = re.compile(r"not_applicable\b(.*)", re.IGNORECASE)
+NOT_APPLICABLE_FORM = re.compile(r"not_applicable \(\s*\S.*\)")
 ALLOWED_STATUSES = {"NOT_STARTED", "IN_PROGRESS", "PASS", "FAIL", "STOPPED"}
 
 
@@ -92,6 +112,14 @@ def read_language(plan: Path, report: Report) -> str:
         )
         return LEGACY_LANGUAGE
     return match.group(1)
+
+
+def target_gate(plan: Path) -> int:
+    """The topic's target gate as a number. Topics created before target_gate
+    was used (missing, or still G0/G1) need every notebook, as G6 does."""
+    match = re.search(r"(?m)^target_gate:\s*G([0-6])\s*$", plan.read_text())
+    gate = int(match.group(1)) if match else 6
+    return gate if gate >= 2 else 6
 
 
 def validate_markdown_layout(name: str, markdown: str, report: Report) -> None:
@@ -173,6 +201,15 @@ def validate_plan(path: Path, language: str, report: Report) -> set[int]:
     active = [gate for gate, row in gate_rows.items() if row[0] == "IN_PROGRESS"]
     if len(active) > 1:
         report.error("research-plan.md: only one gate may be IN_PROGRESS")
+
+    task_type = values.get("task_type", "").strip("\"' ")
+    for field, value in values.items():
+        if not NOT_APPLICABLE.match(value):
+            continue
+        if not NOT_APPLICABLE_FORM.fullmatch(value):
+            report.error(f"research-plan.md: {field} must be written 'not_applicable (<reason>)'")
+        elif field not in NOT_APPLICABLE_ALLOWED.get(task_type, set()):
+            report.error(f"research-plan.md: {field} may not be not_applicable for task_type {task_type!r}")
 
     if gate_rows.get(0, (None,))[0] == "PASS":
         incomplete = [field for field, value in values.items() if not value or "__REQUIRED__" in value]
@@ -318,11 +355,14 @@ def main() -> int:
         def location(filename: str) -> Path:
             return (md_dir if filename.endswith(".md") else topic_dir) / filename
 
+        plan = md_dir / "research-plan.md"
+        target = target_gate(plan) if plan.is_file() else 6
         for filename in REQUIRED_FILES:
+            if NOTEBOOK_GATES.get(filename, 0) > target:
+                continue
             if not location(filename).is_file():
                 report.error(f"missing required file: {location(filename)}")
 
-        plan = md_dir / "research-plan.md"
         passed_gates: set[int] = set()
         language = LEGACY_LANGUAGE
         if plan.is_file():
