@@ -123,6 +123,25 @@ Then give a short ready-to-send message containing the questions, in the tone of
 
 List any term from the conversation that sits outside fullstack engineering (ML, data science, architecture, business or finance jargon, internal acronyms). One plain line each: what it means and why it matters here. If a term looks like an internal name you cannot know, say that and add it to the questions. Scale this to the familiarity the user reported; skip the section if there is nothing to explain.
 
+### 8. Pick the next skill
+
+Name the skill the user should run next, using its exact name from this table:
+
+| Deliverable | Next skill |
+|---|---|
+| Design doc / RFC, or an AI application that needs agreement before building | `design-doc` |
+| DS/ML research whose output is one of: descriptive analysis, classification, regression, forecasting, anomaly detection | `ds-ml-research` |
+| Anything else | No skill yet. Say so, and name the deliverable in plain words |
+
+`ds-ml-research` does not yet cover ranking or search quality, recommendation, clustering, causal inference or LLM evaluation. A task of that kind is "no skill yet", even though it involves data.
+
+When the next skill is `ds-ml-research`, add the Problem Card block to the hand-off (see the output format). Its keys are the ones that skill expects at its first gate. Fill each from what was said or from the interview, and mark everything else `UNKNOWN - ask <role>`. Three rules come from that skill and apply here too:
+- Never choose `research_deliverable`. It is the owner's decision: `feasibility_poc` (is it possible), `model_selection` (pick a model to deploy), or `analysis_report` (describe or explain, no model). You may say which one the wording suggests, as an inference, and put the question in "Ask before you start".
+- `task_type` is your inference from the wording. Mark it as such.
+- `success_criteria` needs a number or a threshold to count as known. "Make it better" is `UNKNOWN`.
+
+The unknown fields that most change the work (usually `research_deliverable`, `decision_or_action` and `success_criteria`) get priority among the questions for the asker.
+
 ## Output format
 
 Lead with the answer. The user should know what to produce after reading two lines.
@@ -155,10 +174,27 @@ Message you can send:
 [term - one-line meaning. Omit if none.]
 
 ## Hand-off
+Next skill: [exact name from step 8, or "no skill yet"]
 Task type: [the deliverable in standard terms, e.g. "API documentation", "DS exploration notebook", "design doc"]
 Rough size: [hours / days, and what would make it bigger]
 Task statement:
 > [Three to five sentences that state the task on their own: goal, deliverable, audience, deadline, done criteria, known constraints. Written so the user can paste it into a fresh session or another skill without this conversation.]
+
+[Only when the next skill is ds-ml-research:]
+Problem Card (draft):
+  task_type:                   [descriptive | classification | regression | forecasting | anomaly_detection] (inferred)
+  research_deliverable:        UNKNOWN - ask <role> [wording suggests: ...]
+  business_owner:
+  technical_owner:
+  decision_user:
+  decision_or_action:
+  target_definition:
+  current_process_or_baseline:
+  primary_business_metric:
+  primary_model_metric:
+  success_criteria:
+  stop_criteria:
+  operational_constraints:
 ```
 
 Keep the whole brief short enough to read in two minutes. Cut any section that has nothing real in it.
@@ -196,6 +232,7 @@ No success measure was given. Without a set of test queries and a definition of 
 Embeddings - numeric representations of text where similar meanings sit close together; lets search match by meaning instead of exact words.
 
 ## Hand-off
+Next skill: no skill yet. Search quality is a ranking problem, which `ds-ml-research` does not cover.
 Task type: DS feasibility study (notebook plus findings doc)
 Rough size: 3-4 days; larger if ticket data needs access approval.
 Task statement:
