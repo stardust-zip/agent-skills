@@ -130,6 +130,7 @@ Name the skill the user should run next, using its exact name from this table:
 | Deliverable | Next skill |
 |---|---|
 | Design doc / RFC, or an AI application that needs agreement before building | `design-doc` |
+| API reference, integration guide, or an API contract between teams (REST, GraphQL, gRPC, events, webhooks) | `api-docs` |
 | DS/ML research whose output is one of: descriptive analysis, classification, regression, forecasting, anomaly detection | `ds-ml-research` |
 | Anything else | No skill yet. Say so, and name the deliverable in plain words |
 
