@@ -1,6 +1,6 @@
 ---
 name: api-docs
-description: Writes API documentation for a service, whatever its style (REST/OpenAPI, GraphQL, gRPC/protobuf, events and webhooks): a reference spec, a usage guide, verified examples, and change notes with a breaking-change check, linted with real tools. Works from existing code, an existing spec, or as a spec-first contract. Use when the user asks for API docs, an OpenAPI/proto/GraphQL/AsyncAPI spec, an integration guide, or brings a task-decoder hand-off whose task type is API documentation.
+description: Writes API documentation for a service, whatever its style (REST/OpenAPI, GraphQL, gRPC/protobuf, events and webhooks): a reference spec, a usage guide, verified examples, and change notes with a breaking-change check, linted with real tools. Works from existing code, an existing spec, or as a spec-first contract. Use when the user asks for API docs, an OpenAPI/proto/GraphQL/AsyncAPI spec, an integration guide, or brings a task-decoder hand-off item routed to api-docs.
 ---
 
 # API Docs

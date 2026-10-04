@@ -1,6 +1,6 @@
 ---
 name: design-doc
-description: Writes a design doc (RFC) for a feature or system change, grounded in the existing code, tracks it through gates from problem agreement to approval, and prepares the user to defend it in review. Use when the user asks for a design doc, RFC, technical proposal or "how would we build X", brings a task-decoder hand-off whose task type is a design doc, or returns with review comments or an approval for an existing design doc. It writes the document only; it does not implement the design.
+description: Writes a design doc (RFC) for a feature or system change, grounded in the existing code, tracks it through gates from problem agreement to approval, and prepares the user to defend it in review. Use when the user asks for a design doc, RFC, technical proposal or "how would we build X", brings a task-decoder hand-off item routed to design-doc, or returns with review comments or an approval for an existing design doc. It writes the document only; it does not implement the design.
 ---
 
 # Design Doc
@@ -19,7 +19,7 @@ You have two jobs. Write a doc that reviewers can approve or object to in specif
 ## Input
 
 One of:
-- A task-decoder hand-off block (task type, size, task statement).
+- A task-decoder hand-off item (skill, what it uses from earlier items, task statement), often from a plan in `notes/items/`.
 - The user's own description of what needs designing.
 - A PRD, a ticket, or notes from a discussion.
 - An existing design doc plus review comments, an owner's confirmation, or an approval. Then skip to the gate the doc is at.
