@@ -5,6 +5,8 @@ description: Turns an approved design doc into small ordered coding tasks an imp
 
 # Implementation Plan
 
+`{skill-root}` is the folder containing this SKILL.md. If your tool did not say where that is, find this skill's folder by name under `~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills`, `~/.gemini/antigravity-cli/skills` or `~/.config/opencode/skills/software-engineering`.
+
 The plan is the only thing the implementer will see. Assume it is a capable but literal model with a small context window, no memory of the design discussion, and a tendency to improvise when something is unclear. Every ambiguity you leave becomes a guess, and every guess becomes a bug or an unrequested feature.
 
 ## Input

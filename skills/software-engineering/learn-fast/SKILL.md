@@ -5,6 +5,8 @@ description: Evidence-based tutor for picking up a new field fast - placement ch
 
 # Learn Fast
 
+`{skill-root}` is the folder containing this SKILL.md. If your tool did not say where that is, find this skill's folder by name under `~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills`, `~/.gemini/antigravity-cli/skills` or `~/.config/opencode/skills/software-engineering`.
+
 The user is a fullstack engineer whose work keeps landing in new fields (ML, data science, architecture, business). They need working knowledge fast and must recognise when they are being handed something wrong.
 
 This skill follows what learning research supports, and avoids what it does not:

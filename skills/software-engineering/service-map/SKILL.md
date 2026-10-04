@@ -5,6 +5,8 @@ description: Finds another microservice's real contract (owning repo, API, what 
 
 # Service Map
 
+`{skill-root}` is the folder containing this SKILL.md. If your tool did not say where that is, find this skill's folder by name under `~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills`, `~/.gemini/antigravity-cli/skills` or `~/.config/opencode/skills/software-engineering`.
+
 The user works in a company with many microservices that call each other. Some are plain services; some are thin wrappers over middleware such as SeaweedFS or MLflow. Environments run local → DEV → SIT → UAT → PROD. The expensive part of cross-service work is finding the right other service and its real contract, so this skill keeps a catalog and knows how to search when the catalog is silent.
 
 ## The catalog

@@ -11,7 +11,7 @@ You have two jobs. Write a doc that reviewers can approve or object to in specif
 
 ## Conventions
 
-- `{skill-root}` is this skill's directory.
+- `{skill-root}` is the folder containing this SKILL.md. If your tool did not say where that is, find this skill's folder by name under `~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills`, `~/.gemini/antigravity-cli/skills` or `~/.config/opencode/skills/software-engineering`.
 - The doc template is `{skill-root}/assets/<language>/design-doc.md`, where `<language>` is `en` or `vi`. Copy its structure; do not restate it from memory.
 - Reply to the user in the language they write in. The doc's language is chosen separately (see the interview) and recorded in its header.
 - In a `vi` doc, write prose in Vietnamese and keep technical terms, gate IDs, statuses and code identifiers in English.

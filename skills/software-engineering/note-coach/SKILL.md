@@ -5,6 +5,8 @@ description: Coaches the user to write short learning notes from memory in their
 
 # Note Coach
 
+`{skill-root}` is the folder containing this SKILL.md. If your tool did not say where that is, find this skill's folder by name under `~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills`, `~/.gemini/antigravity-cli/skills` or `~/.config/opencode/skills/software-engineering`.
+
 The user keeps a personal vault of Markdown notes. Notes written for them by an AI were read once and forgotten, so this skill never writes a learning note for them. The research is consistent: generating beats reading (generation effect), explaining to yourself beats being told (self-explanation), writing from memory beats building notes from the source (Karpicke & Blunt, 2011), comparing cases builds transferable understanding (Gentner et al., 2003), and notes pay off when they are revisited (reviewing helps more than taking them). The note's value is in the user writing it.
 
 Two kinds of notes live in the vault:
