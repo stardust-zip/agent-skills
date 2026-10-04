@@ -21,9 +21,15 @@ Two kinds of notes live in the vault:
 Layout: flat `notes/` (one Markdown file per topic, YAML frontmatter) and flat `cards/` (review cards, one TSV per topic, same base name as the note). File names are domain-prefixed like the existing ones (`compsci-object-storage`); reuse the existing note for a topic rather than creating a second one.
 
 On personal machines:
-- Pull first: `git -C <vault> pull --rebase --autostash`.
-- Afterwards, stage only the files you touched and commit with the repo's convention: `note-creation: <topic>` for a new note, `note-update: <topic>` otherwise. Then push. If pull or push fails, keep the change local and tell the user; never force-push.
+- **Sync only when the user agrees.** Before touching the vault, ask whether to pull the latest version first (pull, or work locally), in the same question batch as the other setup questions rather than as a round of its own. At the end, ask what to do with the changes: commit and push, commit only, or leave uncommitted.
+- When committing, stage only the files you touched, with the repo's convention: `note-creation: <topic>` for a new note, `note-update: <topic>` otherwise.
+- Git may ask for a password, which this session cannot type. If a pull or push fails that way, say so in one line, keep working locally, and suggest the user run the same command themselves with a leading `!`. Never retry in a loop, and never force-push.
 - **No company details.** If the user mentions an internal system, keep it generic and never write internal names, data or designs into the vault.
+
+## Asking
+
+- **Choices go through the question tool.** If the environment has a structured question tool (for example AskUserQuestion), use it for every choice between options: which meaning of a term, the goal and target level, the mode, syncing, keeping or merging a rewrite. Batch up to four of them into a single call. Without such a tool, use a short numbered list.
+- **Quiz and recall questions never do.** They stay open, typed answers, because producing an answer from memory is what builds it; picking from options only tests recognition. The user types the answer and a confidence rating (1 guess, 2 fairly sure, 3 certain) together.
 
 ## Writing a learning note
 
@@ -36,7 +42,7 @@ On personal machines:
 4. **Let the user answer and revise.** Place their answers in the sections: *Why it works*, *Compared with*, *Where I'd use it*. Questions they could not answer go under *Still unclear*: that list is the next study target, not a failure.
 5. **Format only.** Use `{skill-root}/assets/learning-note.md`. Keep the user's words. You may: add headings, bold a key term at first mention, italicise contrastive emphasis, add a callout (`> [!warning]`, `> [!tip]`) around a sentence they wrote, fix typos and grammar that obscure meaning. You may not add facts, examples or explanations of your own. Omit sections that are still empty; the minimum valid note is the title, frontmatter and *In my words*.
 6. **Links are theirs.** Add a wikilink (`[[compsci-object-storage]]`) only to an existing note the user named in their answers. Never add links on your own.
-7. **Show the final note, write it,** update `updated`, and sync. If learn-fast is in use, offer two or three cards made from the gaps, added with learn-fast's script (`{skill-root}/../learn-fast/scripts/cards.sh add <vault>/cards/<note>.tsv ...`).
+7. **Show the final note, write it,** update `updated`, and ask whether to commit and push. If learn-fast is in use, offer two or three cards made from the gaps, added with learn-fast's script (`{skill-root}/../learn-fast/scripts/cards.sh add <vault>/cards/<note>.tsv ...`).
 
 If the user must stop early, save what they have: a short *In my words* is a real note.
 
@@ -47,7 +53,7 @@ Run this when learn-fast's review mode hands over a note, or when the user asks.
 1. Show only the note's title and its *Still unclear* list. Ask for the core again from memory.
 2. Compare the new version with the note's *In my words*, and report briefly: what is new or clearer, what was lost, and anything that contradicts the old version.
 3. Ask the user which version to keep, or how to merge them; merge using their words only. Answers to old *Still unclear* items move into the right sections.
-4. Update `last_reviewed` and `updated`. Raise `status` from `seed` to `growing` after a successful rewrite. Then sync.
+4. Update `last_reviewed` and `updated`. Raise `status` from `seed` to `growing` after a successful rewrite. Then ask whether to commit and push.
 
 ## Status rules
 

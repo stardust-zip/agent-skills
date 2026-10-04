@@ -12,11 +12,14 @@ Reference notes are for looking things up while working: commands, syntax, steps
 - **Work machine** (`~/work-docs/` exists): `~/work-docs/notebook/notes/`, never synced. Examples may use the user's real services (via `service-map`).
 - **Personal machines:** `<vault>/notes/`, where `<vault>` is the first that exists of `$NOTEBOOK_DIR`, `~/notebook` (the phone) and `~/projects/gitea/gitkeeper/notebook` (the laptop). If none exists, ask where the notebook clone is. Never write company details here; keep internal systems generic.
 
-On personal machines, pull before writing (`git -C <vault> pull --rebase --autostash`), then stage only the new or changed notes, commit as `note-creation: <topic>` or `note-update: <topic>`, and push. If pull or push fails, keep the change local and say so; never force-push.
+On personal machines:
+- **Sync only when the user agrees.** Before touching the vault, ask whether to pull the latest version first (pull, or work locally), in the same question batch as the other setup questions rather than as a round of its own. At the end, ask what to do with the changes: commit and push, commit only, or leave uncommitted.
+- When committing, stage only the files you touched, with the repo's convention: `note-creation: <topic>` for a new note, `note-update: <topic>` otherwise.
+- Git may ask for a password, which this session cannot type. If a pull or push fails that way, say so in one line, keep working locally, and suggest the user run the same command themselves with a leading `!`. Never retry in a loop, and never force-push.
 
 ## What to write
 
-Write only what the user asked for. If they asked for "a note on X" without saying which kind, pick the one kind that fits best and say why in one line; do not produce a set.
+Write only what the user asked for. If they asked for "a note on X" without saying which kind, ask which kind with the structured question tool if the environment has one (recommend the best fit first), batched with the sync question; otherwise pick the one kind that fits best and say why in one line. Never produce a set.
 
 | Kind | File name | When it fits | Contents |
 |---|---|---|---|

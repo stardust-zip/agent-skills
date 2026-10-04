@@ -21,9 +21,9 @@ Records live in the user's note vault, the same one `note-coach` uses. Each mach
 
 - **Work machine** (`~/work-docs/` exists): `~/work-docs/notebook/`. No sync. Examples may use the user's real services (via `service-map`).
 - **Personal machines:** the first that exists of `$NOTEBOOK_DIR`, `~/notebook` (the phone) and `~/projects/gitea/gitkeeper/notebook` (the laptop): one private git repository cloned on both. If none exists, ask the user where their notebook clone is (and suggest setting `NOTEBOOK_DIR`); never create a new vault silently.
-  - Before a session: `git -C <vault> pull --rebase --autostash`.
-  - After it: stage only the files the session touched, commit with the repo's convention (`note-creation: <topic>` for a new note, `note-update: <topic>` otherwise), and push.
-  - If a pull or push fails, say so and keep the changes local. Never force-push.
+  - **Sync only when the user agrees.** Before touching the vault, ask whether to pull the latest version first (pull, or work locally), in the same question batch as the other setup questions rather than as a round of its own. At the end, ask what to do with the changes: commit and push, commit only, or leave uncommitted.
+  - When committing, stage only the files you touched, with the repo's convention: `note-creation: <topic>` for a new note, `note-update: <topic>` otherwise.
+  - Git may ask for a password, which this session cannot type. If a pull or push fails that way, say so in one line, keep working locally, and suggest the user run the same command themselves with a leading `!`. Never retry in a loop, and never force-push.
   - **No company details.** Use public knowledge only. If the user mentions an internal system, keep it generic ("your company's file-storage wrapper") and never write internal names, data or designs into the vault.
 
 Per topic, two files with the same domain-prefixed base name (`compsci-vector-databases`):
@@ -60,6 +60,8 @@ The first time a topic is studied on this machine, run a **placement check**, ev
 
 ## Rules for every interaction
 
+- **Choices go through the question tool.** If the environment has a structured question tool (for example AskUserQuestion), use it for every choice between options: which meaning of a term, the goal and target level, the mode, syncing, keeping or merging a rewrite. Batch up to four of them into a single call. Without such a tool, use a short numbered list.
+- **Quiz and recall questions never do.** They stay open, typed answers, because producing an answer from memory is what builds it; picking from options only tests recognition. The user types the answer and a confidence rating (1 guess, 2 fairly sure, 3 certain) together.
 - **One question at a time.** Ask, then wait for the user's answer and confidence before saying anything about it.
 - **Attempt before answer.** If the user asks to just be told, give a hint first; tell them outright only on a second request, and note it in the session log.
 - **Feedback that teaches:** say what was right, what was missing, and why, in a few sentences. Then move on.
@@ -69,7 +71,7 @@ The first time a topic is studied on this machine, run a **placement check**, ev
 
 ## Modes
 
-Pick the mode from the request; ask only if unclear.
+Open every session with one batch of setup questions through the question tool, skipping any the request already answers: which meaning, if the topic is ambiguous (for example "MAD"); the goal, which sets the target level; the mode; and whether to pull the vault first. Then start.
 
 **Full session (45–60 minutes).**
 1. **Target:** what the knowledge is for, and the level that requires. A task-decoder plan or a meeting invite can supply it.
@@ -82,7 +84,7 @@ Pick the mode from the request; ask only if unclear.
 5. **Transfer:** one task from the user's real work: explain it to their boss in three sentences, critique a design, write the questions they would ask a vendor or an expert.
 6. **Cards:** add five to ten, mostly from what the user got wrong or found hard, tagged with their level.
 7. **Note:** hand over to `note-coach` so the user writes or extends the learning note from memory. If they are out of time, add a card with the question "NOTE: write the note on <topic> from memory" (answer "use note-coach") so it comes back in review.
-8. **Close:** level changes, calibration, what to review tomorrow. Update the note's *Progress* section, then sync if on a personal machine.
+8. **Close:** level changes, calibration, what to review tomorrow. Update the note's *Progress* section, then ask whether to commit and push (personal machines).
 
 **Meeting in an hour (about 15 minutes).**
 1. The meeting's subject and the user's role in it.
