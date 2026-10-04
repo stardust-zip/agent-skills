@@ -128,7 +128,7 @@ Then give a short ready-to-send message containing the questions, in the tone of
 
 ### 8. Explain the unfamiliar terms
 
-List any term from the conversation that sits outside fullstack engineering (ML, data science, architecture, business or finance jargon, internal acronyms). One plain line each: what it means and why it matters here. If a term looks like an internal name you cannot know, say that and add it to the questions. Scale this to the familiarity the user reported; skip it if there is nothing to explain.
+List any term from the conversation that sits outside fullstack engineering (ML, data science, architecture, business or finance jargon, internal acronyms). One plain line each: what it means and why it matters here. If a term looks like an internal name you cannot know, say that and add it to the questions. Scale this to the familiarity the user reported; skip it if there is nothing to explain. If the plan depends on the user understanding a field well beyond a few definitions, suggest a `learn-fast` session (meeting-in-an-hour mode when a meeting is close).
 
 ### 9. Pick the skill for each item
 
