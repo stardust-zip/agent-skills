@@ -1,0 +1,28 @@
+# Service catalog for the service-map skill. Lives outside every repository.
+# Every value carries a source: "path:line" in the provider or consumer repo,
+# or "user, YYYY-MM-DD". Never store secrets; store the variable name instead.
+
+clones_root: ~/work                          # source: user, 2026-10-04
+environments: [local, dev, sit]   # in scope for now; UAT and PROD are not recorded
+
+services:
+  - name: file-gateway
+    aliases: [fgw, file-service]
+    kind: wrapper                    # service | wrapper | library | job
+    wraps: seaweedfs 3.68            # source: file-gateway/go.mod:14
+    purpose: Upload and download of user files; hides SeaweedFS volumes and filer paths.
+    owner: Storage team              # source: user, 2026-10-04
+    repo: ~/work/file-gateway
+    git_url: https://gitlab.example.internal/platform/file-gateway.git
+    api:
+      style: rest                    # rest | graphql | grpc | events
+      spec: api/openapi.yaml         # path inside the repo
+      auth: bearer token, variable FILE_GATEWAY_TOKEN   # source: file-gateway/internal/auth/middleware.go:22
+    depends_on: [auth-service]
+    config_sources: [deploy/helm/values-dev.yaml, deploy/helm/values-sit.yaml]
+    environments:
+      local: http://localhost:8081                        # source: file-gateway/docker-compose.yml:9
+      dev: https://file-gateway.dev.example.internal      # source: file-gateway/deploy/helm/values-dev.yaml:31
+      sit: https://file-gateway.sit.example.internal      # source: file-gateway/deploy/helm/values-sit.yaml:31
+    verified: 2026-10-04
+    notes: Multipart uploads above 64 MB go through /v1/uploads/chunked.   # source: file-gateway/api/openapi.yaml:120
