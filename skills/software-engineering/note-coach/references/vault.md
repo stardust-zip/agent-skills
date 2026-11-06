@@ -13,7 +13,7 @@ Layout: flat `notes/` (one Markdown file per topic, YAML frontmatter) and flat `
 
 - **No company details.** Use public knowledge only. If the user mentions an internal system, keep it generic ("your company's file-storage wrapper") and never write internal names, data or designs into the vault.
 - **Sync only when the user agrees.** Before touching the vault, ask whether to pull the latest version first (pull, or work locally), in the same question batch as the other setup questions rather than as a round of its own. At the end, ask what to do with the changes: commit and push, commit only, or leave uncommitted.
-- When committing, stage only the files you touched, with the repo's convention: `note-creation: <topic>` for a new note, `note-update: <topic>` otherwise.
+- When committing, stage only the files you touched (grading cards also touches `cards/.review-log`), with the repo's convention: `note-creation: <topic>` for a new note, `note-update: <topic>` otherwise.
 - Git may ask for a password, which this session cannot type. If a pull or push fails that way, say so in one line, keep working locally, and suggest the user run the same command themselves with a leading `!`. Never retry in a loop, and never force-push.
 - In a cloud session (Claude Code on the web or in the Claude app) the repository is a fresh clone, so skip the pull question. At the end, still ask before committing, then follow the session's own git workflow; it may push to a branch of its own for the user to merge.
 

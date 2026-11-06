@@ -14,6 +14,10 @@
 # Dates are ISO (YYYY-MM-DD), so string order is date order. "Today" is the
 # machine's local date, or the date in $NOTEBOOK_TZ when set (cloud sessions
 # run on UTC).
+#
+# Reviews: each grade adds a line to .review-log next to the cards (date, topic,
+# id, level, result, box), so `history` can show whether reviews happen and
+# what they retain. The cards themselves keep only the current box and date.
 set -euo pipefail
 
 intervals=(0 1 3 7 16 35 75) # card days, indexed by box 1..6
@@ -24,12 +28,14 @@ header=$'id\tlevel\tbox\tdue\tquestion\tanswer\tsource'
 
 usage() {
   cat >&2 <<'EOF'
-usage: cards.sh add <cards.tsv> <level 1-4> <question> <answer> [source]
-       cards.sh due <cards.tsv>...           cards due today or earlier (no answers)
+usage: A <cards> argument is a cards folder or any number of .tsv files.
+       cards.sh add <cards.tsv> <level 1-4> <question> <answer> [source]
+       cards.sh due <cards>...                cards due today or earlier, oldest first, topics mixed (no answers)
        cards.sh ask <cards.tsv> <id>          the full question of one card
        cards.sh show <cards.tsv> <id>         the answer and source of one card
        cards.sh grade <cards.tsv> <id> again|hard|good
-       cards.sh stats <cards.tsv>...          total, due and per-box counts
+       cards.sh stats <cards>...              total, due and per-box counts
+       cards.sh history <cards-folder> [days] reviews and results per topic (default 30 days)
 EOF
   exit 2
 }
@@ -57,6 +63,19 @@ need_file() { [ -f "$1" ] || { echo "no cards file $1" >&2; exit 1; }; }
 
 topic_of() { basename "$1" .tsv; }
 
+# card_files <cards>...: the .tsv files in the given folders and files. Taking a
+# folder keeps callers off globs, which zsh refuses when nothing matches.
+card_files() {
+  local arg
+  for arg in "$@"; do
+    if [ -d "$arg" ]; then
+      find "$arg" -maxdepth 1 -name '*.tsv' | sort
+    elif [ -f "$arg" ]; then
+      printf '%s\n' "$arg"
+    fi
+  done
+}
+
 cmd="${1:-}"
 [ -n "$cmd" ] || usage
 shift
@@ -77,11 +96,14 @@ case "$cmd" in
 
   due)
     [ $# -ge 1 ] || usage
-    for file in "$@"; do
-      [ -f "$file" ] || continue
-      awk -F'\t' -v today="$today" -v topic="$(topic_of "$file")" \
-        'NR > 1 && $4 <= today { print topic "\t" $1 "\tlevel " $2 "\t" $5 }' "$file"
-    done
+    # Each topic's cards oldest first, then one from each topic in turn, so a
+    # review that stops early doesn't starve the topics that sort last.
+    card_files "$@" | while IFS= read -r file; do
+      awk -F'\t' -v OFS='\t' -v today="$today" -v topic="$(topic_of "$file")" \
+        'NR > 1 && $4 <= today { print $4, topic, $1, "level " $2, $5 }' "$file" |
+        sort -s -t $'\t' -k1,1 |
+        awk -F'\t' -v OFS='\t' '{ print NR, $2, $3, $4, $5 }'
+    done | sort -s -n -k1,1 | cut -f2-
     ;;
 
   ask)
@@ -117,13 +139,15 @@ case "$cmd" in
     awk -F'\t' -v OFS='\t' -v id="$id" -v box="$box" -v due="$due" \
       'NR > 1 && $1 == id { $3 = box; $4 = due } { print }' "$file" >"$tmp"
     mv "$tmp" "$file"
+    level=$(awk -F'\t' -v id="$id" 'NR > 1 && $1 == id { print $2 }' "$file")
+    printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$today" "$(topic_of "$file")" "$id" "$level" "$result" "$box" \
+      >>"$(dirname "$file")/.review-log"
     echo "card $id: box $box, due $due"
     ;;
 
   stats)
     [ $# -ge 1 ] || usage
-    for file in "$@"; do
-      [ -f "$file" ] || continue
+    card_files "$@" | while IFS= read -r file; do
       awk -F'\t' -v today="$today" -v topic="$(topic_of "$file")" '
         NR > 1 { total++; boxes[$3]++; if ($4 <= today) due++ }
         END {
@@ -132,6 +156,25 @@ case "$cmd" in
           print line
         }' "$file"
     done
+    ;;
+
+  history)
+    [ $# -ge 1 ] || usage
+    log="$1/.review-log" days="${2:-30}"
+    [ -f "$log" ] || { echo "no reviews yet"; exit 0; }
+    since=$(date -d "$today - $days day" +%F)
+    awk -F'\t' -v since="$since" -v days="$days" '
+      $1 >= since {
+        reviews[$2]++; results[$2, $5]++; total++; all[$5]++
+        if (!($1 in active)) { active[$1] = 1; active_days++ }
+      }
+      END {
+        printf "last %d days: %d reviews on %d days, good=%d hard=%d again=%d\n",
+          days, total, active_days, all["good"], all["hard"], all["again"]
+        for (t in reviews)
+          printf "%s: %d reviews, good=%d hard=%d again=%d\n",
+            t, reviews[t], results[t, "good"], results[t, "hard"], results[t, "again"]
+      }' "$log"
     ;;
 
   *) usage ;;

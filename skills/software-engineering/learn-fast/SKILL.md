@@ -25,11 +25,12 @@ Per topic, two files with the same domain-prefixed base name (`compsci-vector-da
 
 ```bash
 bash {skill-root}/scripts/cards.sh add <vault>/cards/<name>.tsv <level> "<question>" "<answer>" "<source>"
-bash {skill-root}/scripts/cards.sh due <vault>/cards/*.tsv      # questions only, never answers
+bash {skill-root}/scripts/cards.sh due <vault>/cards            # questions only, never answers; topics mixed, oldest first
 bash {skill-root}/scripts/cards.sh ask <cards.tsv> <id>         # one question in full (multi-line)
 bash {skill-root}/scripts/cards.sh show <cards.tsv> <id>        # reveal one answer
 bash {skill-root}/scripts/cards.sh grade <cards.tsv> <id> again|hard|good
-bash {skill-root}/scripts/cards.sh stats <vault>/cards/*.tsv
+bash {skill-root}/scripts/cards.sh stats <vault>/cards
+bash {skill-root}/scripts/cards.sh history <vault>/cards        # reviews and results over 30 days, from cards/.review-log
 ```
 
 Questions and answers may span several lines and hold code; pass them as they are and the script stores them safely. `due` lists them on one line each, escaped; use `ask` to show a question as written.
@@ -98,7 +99,7 @@ Open every session with one batch of setup questions through the question tool, 
 
 **Review (5–10 minutes).**
 1. List due cards with `cards.sh due` (or one topic, if the user names it).
-2. Go through them one at a time, at most about twenty, and stop early if the user wants. Never two `NOTE:` cards in a row, and at most two `NOTE:` and two `DO:` cards per review; leave the rest due.
+2. Go through them in the listed order, one at a time, at most about twenty, and stop early if the user wants. Never two `NOTE:` cards in a row, and at most two `NOTE:` and two `DO:` cards per review; leave the rest due.
 3. For a recall card: show the question (with `ask` when `due` shows it escaped), wait for the answer and confidence, then `show` the answer, give one line of feedback, and `grade`. A card graded `again` stays due today: before closing, ask each card missed in this review once more, and grade it `hard` if now right; if still wrong, leave it ungraded so it stays due.
 4. A `NOTE:` card hands over to `note-coach` to write or rewrite that note; grade it `good` once done, `hard` if postponed.
 5. A `DO:` card is an exercise: set up a scratch folder as in Practice, write its stored check there, and let the user solve it; grade `good` for an unaided pass, `hard` for a pass after a hint, `again` otherwise.
