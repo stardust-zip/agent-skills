@@ -7,9 +7,6 @@
 # it is due again (expanding intervals, the spacing effect). A missed card
 # stays due today, so the same review can ask it once more.
 #
-# Notes: learning notes (frontmatter `type: learning`) come due for a
-# rewrite from memory based on their status and `last_reviewed` date.
-#
 # Questions and answers may span lines and hold tabs (code): they are stored
 # escaped (\n, \t, \\) so each card stays one TSV row, and `ask` and `show`
 # print them back as written. `due` lists them escaped, one card per line.
@@ -21,7 +18,6 @@ set -euo pipefail
 
 intervals=(0 1 3 7 16 35 75) # card days, indexed by box 1..6
 max_box=6
-declare -A note_interval=([seed]=3 [growing]=14 [green]=45) # note days, by status
 [ -z "${NOTEBOOK_TZ:-}" ] || export TZ="$NOTEBOOK_TZ"
 today=$(date +%F)
 header=$'id\tlevel\tbox\tdue\tquestion\tanswer\tsource'
@@ -34,8 +30,6 @@ usage: cards.sh add <cards.tsv> <level 1-4> <question> <answer> [source]
        cards.sh show <cards.tsv> <id>         the answer and source of one card
        cards.sh grade <cards.tsv> <id> again|hard|good
        cards.sh stats <cards.tsv>...          total, due and per-box counts
-       cards.sh notes-due <notes-dir>         learning notes due for a rewrite from memory
-       cards.sh notes-stale <notes-dir> [days] learning notes not reviewed for days (default 60)
 EOF
   exit 2
 }
@@ -62,15 +56,6 @@ unescape='function unescape(s,   out, c, i) {
 need_file() { [ -f "$1" ] || { echo "no cards file $1" >&2; exit 1; }; }
 
 topic_of() { basename "$1" .tsv; }
-
-# frontmatter <file> <key>: the value of a top-level key in the YAML frontmatter.
-frontmatter() {
-  awk -v key="$2" '
-    NR == 1 && $0 != "---" { exit }
-    NR > 1 && $0 == "---" { exit }
-    NR > 1 && index($0, key ":") == 1 { sub("^" key ":[ \t]*", ""); gsub(/["'\'']/, ""); print; exit }
-  ' "$1"
-}
 
 cmd="${1:-}"
 [ -n "$cmd" ] || usage
@@ -146,37 +131,6 @@ case "$cmd" in
           for (b = 1; b <= 6; b++) line = line sprintf(", box%d=%d", b, boxes[b] + 0)
           print line
         }' "$file"
-    done
-    ;;
-
-  notes-due)
-    [ $# -eq 1 ] || usage
-    for note in "$1"/*.md; do
-      [ -f "$note" ] || continue
-      [ "$(frontmatter "$note" type)" = learning ] || continue
-      status=$(frontmatter "$note" status)
-      last=$(frontmatter "$note" last_reviewed)
-      [ -n "$last" ] || last=$(frontmatter "$note" created)
-      days="${note_interval[$status]:-3}"
-      due=$(date -d "${last:-$today} + $days day" +%F 2>/dev/null) || due="$today"
-      if [[ "$due" < "$today" || "$due" == "$today" ]]; then
-        printf '%s\t%s\tlast reviewed %s\n' "$(basename "$note" .md)" "${status:-seed}" "${last:-never}"
-      fi
-    done
-    ;;
-
-  notes-stale)
-    [ $# -ge 1 ] || usage
-    days="${2:-60}"
-    cutoff=$(date -d "$today - $days day" +%F)
-    for note in "$1"/*.md; do
-      [ -f "$note" ] || continue
-      [ "$(frontmatter "$note" type)" = learning ] || continue
-      last=$(frontmatter "$note" last_reviewed)
-      [ -n "$last" ] || last=$(frontmatter "$note" created)
-      if [ -z "$last" ] || [[ "$last" < "$cutoff" ]]; then
-        printf '%s\tlast reviewed %s\n' "$(basename "$note" .md)" "${last:-never}"
-      fi
     done
     ;;
 

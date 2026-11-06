@@ -1,6 +1,6 @@
 ---
 name: note-coach
-description: Coaches the user to write short learning notes from memory in their own words - flags gaps and errors as questions, asks why and compare prompts, then only formats - and runs rewrite-from-memory reviews of existing notes. Use after studying, reading or a meeting, when learn-fast hands off, or when a note is due for review.
+description: Coaches the user to write short learning notes from memory in their own words - flags gaps and errors as questions, asks why and compare prompts, then only formats - and runs rewrite-from-memory reviews of existing notes. Use after studying, reading or a meeting, when learn-fast hands off, or when a NOTE card comes due.
 ---
 
 # Note Coach
@@ -13,24 +13,7 @@ Two kinds of notes live in the vault:
 - **Learning notes** (`type: learning`): written by the user from memory. This skill's job.
 - **Reference notes** (`type: reference`, `guide`, `concept` from the past): lookups, may be AI-written, never count as known. If the user insists on "just write it for me", use the `reference-note` skill instead and say so; never label AI-written text a learning note.
 
-## The vault
-
-- **Work machine** (`~/work-docs/` exists): `~/work-docs/notebook/`, never synced.
-- **Personal machines:** the first that exists of: the current Git repository, if it is the vault (its root has `notes/` and an `AGENTS.md` that describes `cards/` and learning notes), which is the case in a cloud session from the Claude app; `$NOTEBOOK_DIR`; `~/notebook` (the phone); `~/projects/gitea/gitkeeper/notebook` (the laptop). If none exists, ask the user where their notebook clone is (and suggest setting `NOTEBOOK_DIR`); never create a new vault silently.
-
-Layout: flat `notes/` (one Markdown file per topic, YAML frontmatter) and flat `cards/` (review cards, one TSV per topic, same base name as the note). File names are domain-prefixed like the existing ones (`compsci-object-storage`); reuse the existing note for a topic rather than creating a second one.
-
-On personal machines:
-- **Sync only when the user agrees.** Before touching the vault, ask whether to pull the latest version first (pull, or work locally), in the same question batch as the other setup questions rather than as a round of its own. At the end, ask what to do with the changes: commit and push, commit only, or leave uncommitted.
-- When committing, stage only the files you touched, with the repo's convention: `note-creation: <topic>` for a new note, `note-update: <topic>` otherwise.
-- Git may ask for a password, which this session cannot type. If a pull or push fails that way, say so in one line, keep working locally, and suggest the user run the same command themselves with a leading `!`. Never retry in a loop, and never force-push.
-- In a cloud session (Claude Code on the web or in the Claude app) the repository is a fresh clone, so skip the pull question. At the end, still ask before committing, then follow the session's own git workflow; it may push to a branch of its own for the user to merge.
-- **No company details.** If the user mentions an internal system, keep it generic and never write internal names, data or designs into the vault.
-
-## Asking
-
-- **Choices go through the question tool.** If the environment has a structured question tool (for example AskUserQuestion), use it for every choice between options: which meaning of a term, the goal and target level, the mode, syncing, keeping or merging a rewrite. Batch up to four of them into a single call. Without such a tool, use a short numbered list.
-- **Quiz and recall questions never do.** They stay open, typed answers, because producing an answer from memory is what builds it; picking from options only tests recognition. The user types the answer and a confidence rating (1 guess, 2 fairly sure, 3 certain) together.
+Before touching the vault, read `{skill-root}/references/vault.md`: where the vault is, its layout, when to sync, and how to ask questions.
 
 ## Writing a learning note
 
@@ -40,31 +23,29 @@ On personal machines:
    - Up to three gaps or errors, each phrased as a question ("You said X; what happens when Y?"). Check claims against the source or reliable knowledge; never invent a correction.
    - One deeper prompt, chosen to fit: "Why does it work that way?" or "How does it differ from <neighbouring concept>?"
    - One connection prompt: "What does this remind you of, or contrast with?"
-4. **Let the user answer and revise.** Place their answers in the sections: *Why it works*, *Compared with*, *Where I'd use it*, and, for a tool, *Gotchas* (mistakes they actually hit in practice, in their words). Questions they could not answer go under *Still unclear*: that list is the next study target, not a failure.
+4. **Let the user answer and revise.** Add their answers to *In my words*. If an answer deserves its own section, give it a heading such as *Why it works*, *Compared with*, *Where I'd use it* or, for a tool, *Gotchas* (mistakes they actually hit in practice, in their words). Questions they could not answer go under *Still unclear*: that list is the next study target, not a failure.
 5. **Format only.** Use `{skill-root}/assets/learning-note.md`. Keep the user's words. You may: add headings, bold a key term at first mention, italicise contrastive emphasis, add a callout (`> [!warning]`, `> [!tip]`) around a sentence they wrote, fix typos and grammar that obscure meaning. You may not add facts, examples or explanations of your own. Omit sections that are still empty; the minimum valid note is the title, frontmatter and *In my words*.
 6. **Links are theirs.** Add a wikilink (`[[compsci-object-storage]]`) only to an existing note the user named in their answers. Never add links on your own.
-7. **Show the final note, write it,** update `updated`, and ask whether to commit and push. If learn-fast is in use, offer two or three cards made from the gaps, added with learn-fast's script (`{skill-root}/../learn-fast/scripts/cards.sh add <vault>/cards/<note>.tsv ...`).
+7. **Show the final note, write it,** and update `updated`.
+8. **Schedule the rewrite.** If the note has no rewrite card yet, add one and grade it once, so the first rewrite comes after three days and later ones further apart. Use the note's `level`, or 1 if it is 0:
+   ```bash
+   bash {skill-root}/../learn-fast/scripts/cards.sh add <vault>/cards/<note>.tsv <level> "NOTE: rewrite <note> from memory" "use note-coach"
+   bash {skill-root}/../learn-fast/scripts/cards.sh grade <vault>/cards/<note>.tsv <id> good
+   ```
+   If learn-fast is in use, offer two or three more cards made from the gaps. Then ask whether to commit and push.
 
 If the user must stop early, save what they have: a short *In my words* is a real note.
 
 ## Rewrite from memory (review)
 
-Run this when learn-fast's review mode hands over a note, or when the user asks. Due notes come from `{skill-root}/../learn-fast/scripts/cards.sh notes-due <vault>/notes`.
+Run this when learn-fast's review reaches a `NOTE:` card, or when the user asks.
 
 1. Show only the note's title and its *Still unclear* list. Ask for the core again from memory.
 2. Compare the new version with the note's *In my words*, and report briefly: what is new or clearer, what was lost, and anything that contradicts the old version.
-3. Ask the user which version to keep, or how to merge them; merge using their words only. Answers to old *Still unclear* items move into the right sections.
-4. Update `last_reviewed` and `updated`. Raise `status` from `seed` to `growing` after a successful rewrite. Then ask whether to commit and push.
+3. Ask the user which version to keep, or how to merge them; merge using their words only. Answers to old *Still unclear* items move into the note.
+4. Update `updated`, then ask whether to commit and push.
 
-## Status rules
-
-Status follows evidence, never effort or length:
-- `seed`: written.
-- `growing`: rewritten from memory at least once.
-- `green`: level 3 or higher is `known` (passed twice, on different days), and for a tool topic the *Do* row too, and the note is `growing`. Only learn-fast sets this, and it sets the note back to `growing` when a review shows that level slipping.
-- `level` (0–4): the highest level learn-fast has recorded as `placed` or `known`.
-
-Reference notes have no learning status; leave theirs alone.
+The `level` field belongs to learn-fast; leave it alone. Reference notes have no level.
 
 ## Style
 

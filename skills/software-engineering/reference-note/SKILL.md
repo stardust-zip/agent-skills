@@ -5,18 +5,11 @@ description: Writes AI-researched reference notes for lookup - concept overviews
 
 # Reference Note
 
+`{skill-root}` is the folder containing this SKILL.md. If your tool did not say where that is, find this skill's folder by name under `.claude/skills` in the current repository, `~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills`, `~/.gemini/antigravity-cli/skills` or `~/.config/opencode/skills/software-engineering`.
+
 Reference notes are for looking things up while working: commands, syntax, steps, comparisons. They may be AI-written because their job is external storage, not learning. They never count as something the user knows; learning notes (`type: learning`) are written by the user through `note-coach`.
 
-## The vault
-
-- **Work machine** (`~/work-docs/` exists): `~/work-docs/notebook/notes/`, never synced. Examples may use the user's real services (via `service-map`).
-- **Personal machines:** `<vault>/notes/`, where `<vault>` is the first that exists of: the current Git repository, if it is the vault (its root has `notes/` and an `AGENTS.md` that describes `cards/` and learning notes), which is the case in a cloud session from the Claude app; `$NOTEBOOK_DIR`; `~/notebook` (the phone); `~/projects/gitea/gitkeeper/notebook` (the laptop). If none exists, ask where the notebook clone is. Never write company details here; keep internal systems generic.
-
-On personal machines:
-- **Sync only when the user agrees.** Before touching the vault, ask whether to pull the latest version first (pull, or work locally), in the same question batch as the other setup questions rather than as a round of its own. At the end, ask what to do with the changes: commit and push, commit only, or leave uncommitted.
-- When committing, stage only the files you touched, with the repo's convention: `note-creation: <topic>` for a new note, `note-update: <topic>` otherwise.
-- Git may ask for a password, which this session cannot type. If a pull or push fails that way, say so in one line, keep working locally, and suggest the user run the same command themselves with a leading `!`. Never retry in a loop, and never force-push.
-- In a cloud session (Claude Code on the web or in the Claude app) the repository is a fresh clone, so skip the pull question. At the end, still ask before committing, then follow the session's own git workflow; it may push to a branch of its own for the user to merge.
+Before touching the vault, read `{skill-root}/../note-coach/references/vault.md`: where the vault is, its layout, when to sync, and how to ask questions. Reference notes go in `<vault>/notes/`.
 
 ## What to write
 
@@ -48,7 +41,7 @@ created: YYYY-MM-DD
 updated: YYYY-MM-DD
 ```
 
-No `status` or `level`: reference notes have no learning status.
+No `level`: reference notes have no learning record.
 
 ## Style
 
